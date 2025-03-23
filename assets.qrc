@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>assets/Enemies/spr_bat.png</file>
+        <file>assets/Towers/Castle/spr_castle_blue.png</file>
+    </qresource>
+</RCC>

@@ -1,18 +1,92 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QGraphicsScene, QGraphicsView, QGraphicsRectItem
-from PyQt5.QtGui import QBrush, QColor
-from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import (
+    QApplication, QGraphicsScene, QGraphicsView, QGraphicsRectItem, QGraphicsItem, QGraphicsPixmapItem
+)
+from PyQt5.QtGui import QBrush, QColor, QPen, QPainter, QPixmap
+from PyQt5.QtCore import Qt, QRectF, QTimer
+
+import assets_rc
 
 # Stałe dla planszy
-GRID_SIZE = 50  # Rozmiar pojedynczej kratki
-GRID_WIDTH = 10  # Szerokość planszy (liczba kratek)
-GRID_HEIGHT = 10  # Wysokość planszy (liczba kratek)
+GRID_SIZE = 100
+GRID_WIDTH = 10
+GRID_HEIGHT = 10
 
 # Kolory
 GRAY = QColor(200, 200, 200)
 DARK_GRAY = QColor(150, 150, 150)
-BROWN = QColor(139, 69, 19)  # Kolor ścieżki
-RED = QColor(255, 0, 0)  # Kolor wybranego pola
+BROWN = QColor(139, 69, 19)
+RED = QColor(255, 0, 0)
+BLUE = QColor(0, 0, 255)
+GREEN = QColor(0, 255, 0)
+
+from PyQt5.QtWidgets import QGraphicsItem
+from PyQt5.QtGui import QPixmap, QPainter
+from PyQt5.QtCore import QTimer, QRectF, Qt
+
+class GameUnit(QGraphicsItem):
+    def __init__(self, x, y, sprite_path, frame_count=1, frame_duration=0, parent=None):
+        super().__init__(parent)
+        self.grid_x = x
+        self.grid_y = y
+        self.setPos(x * GRID_SIZE, y * GRID_SIZE)
+
+        # Ładowanie sprite sheeta
+        self.sprite_sheet = QPixmap(sprite_path)
+        self.frame_count = frame_count
+        self.frame_index = 0
+        self.frame_width = self.sprite_sheet.width() // frame_count
+        self.frame_height = self.sprite_sheet.height()
+
+        # Animacja
+        self.timer = QTimer()
+        if frame_duration > 0:
+            self.timer.timeout.connect(self.next_frame)
+            self.timer.start(frame_duration)
+
+    def boundingRect(self):
+        return QRectF(0, 0, GRID_SIZE, GRID_SIZE)
+
+    def paint(self, painter, option, widget):
+        frame = self.get_current_frame()
+        painter.drawPixmap(0, 0, frame)
+
+    def get_current_frame(self):
+        x = self.frame_index * self.frame_width
+        frame = self.sprite_sheet.copy(x, 0, self.frame_width, self.frame_height)
+        return frame.scaled(
+            GRID_SIZE, GRID_SIZE,
+            Qt.KeepAspectRatio,
+            Qt.FastTransformation  # zachowanie pixel-artu
+        )
+
+    def next_frame(self):
+        self.frame_index = (self.frame_index + 1) % self.frame_count
+        self.update()  # wywołuje repaint()
+
+
+
+
+class AnimatedEnemy(GameUnit):
+    def __init__(self, x, y):
+        super().__init__(
+            x, y,
+            sprite_path=":/assets/Enemies/spr_bat.png",
+            frame_count=4,
+            frame_duration=200
+        )
+        # Możesz dodać np. self.hp = 100, self.speed = 2 itd.
+
+
+
+class AnimatedTower(GameUnit):
+    def __init__(self, x, y):
+        super().__init__(
+            x, y,
+            sprite_path=":/assets/Towers/Castle/spr_castle_blue.png",
+            frame_count=4,
+            frame_duration=200
+        )
 
 
 class GameScene(QGraphicsScene):
@@ -22,23 +96,24 @@ class GameScene(QGraphicsScene):
         self.selected_tiles = set()
         self.init_grid()
 
+        self.addItem(AnimatedEnemy(1, 1))
+        self.addItem(AnimatedTower(3, 3))
+
     def init_grid(self):
-        """Tworzy siatkę planszy."""
         for x in range(GRID_WIDTH):
             for y in range(GRID_HEIGHT):
                 tile = QGraphicsRectItem(x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE)
                 if y == GRID_HEIGHT // 2:
-                    tile.setBrush(QBrush(BROWN))  # Ścieżka przez środek
+                    tile.setBrush(QBrush(BROWN))
                 else:
-                    tile.setBrush(QBrush(GRAY))  # Szare tło
+                    tile.setBrush(QBrush(GRAY))
                 tile.setPen(DARK_GRAY)
-                tile.setData(0, (x, y))  # Przechowywanie pozycji
+                tile.setData(0, (x, y))
                 tile.setAcceptHoverEvents(True)
                 tile.setFlag(QGraphicsRectItem.ItemIsSelectable)
                 self.addItem(tile)
 
     def mousePressEvent(self, event):
-        """Obsługuje kliknięcie myszy, zmieniając kolor wybranego pola na czerwony."""
         item = self.itemAt(event.scenePos(), self.views()[0].transform())
         if item and isinstance(item, QGraphicsRectItem):
             pos = item.data(0)
