@@ -1,6 +1,50 @@
 <RCC>
     <qresource prefix="/">
         <file>assets/Enemies/spr_bat.png</file>
+        <file>assets/Enemies/spr_big_slime.png</file>
+        <file>assets/Enemies/spr_demon.png</file>
+        <file>assets/Enemies/spr_ghost.png</file>
+        <file>assets/Enemies/spr_goblin.png</file>
+        <file>assets/Enemies/spr_king_slime.png</file>
+        <file>assets/Enemies/spr_normal_slime.png</file>
+        <file>assets/Enemies/spr_skeleton.png</file>
+        <file>assets/Enemies/spr_zombie.png</file>
+        <file>assets/Environment/Decoration/spr_mushroom_01.png</file>
+        <file>assets/Environment/Decoration/spr_mushroom_02.png</file>
+        <file>assets/Environment/Decoration/spr_rock_01.png</file>
+        <file>assets/Environment/Decoration/spr_rock_02.png</file>
+        <file>assets/Environment/Decoration/spr_rock_03.png</file>
+        <file>assets/Environment/Decoration/spr_tree_01_autumn.png</file>
+        <file>assets/Environment/Decoration/spr_tree_01_cherry_blossom.png</file>
+        <file>assets/Environment/Decoration/spr_tree_01_normal.png</file>
+        <file>assets/Environment/Decoration/spr_tree_02_autumn.png</file>
+        <file>assets/Environment/Decoration/spr_tree_02_normal.png</file>
+        <file>assets/Environment/Decoration/spr_tree_02_spruce.png</file>
+        <file>assets/Environment/Grass/spr_grass_01.png</file>
+        <file>assets/Environment/Grass/spr_grass_02.png</file>
+        <file>assets/Environment/Grass/spr_grass_03.png</file>
+        <file>assets/Environment/Tile Set/spr_tile_set_ground.png</file>
+        <file>assets/Environment/Tile Set/spr_tile_set_stone.png</file>
         <file>assets/Towers/Castle/spr_castle_blue.png</file>
+        <file>assets/Towers/Castle/spr_castle_green.png</file>
+        <file>assets/Towers/Castle/spr_castle_red.png</file>
+        <file>assets/Towers/Combat Towers Projectiles/spr_tower_archer_projectile.png</file>
+        <file>assets/Towers/Combat Towers Projectiles/spr_tower_cannon_projectile.png</file>
+        <file>assets/Towers/Combat Towers Projectiles/spr_tower_crossbow_projectile.png</file>
+        <file>assets/Towers/Combat Towers Projectiles/spr_tower_ice_wizard_projectile.png</file>
+        <file>assets/Towers/Combat Towers Projectiles/spr_tower_lightning_tower_projectile.png</file>
+        <file>assets/Towers/Combat Towers Projectiles/spr_tower_poison_wizard_projectile.png</file>
+        <file>assets/Towers/Combat Towers/spr_tower_archer.png</file>
+        <file>assets/Towers/Combat Towers/spr_tower_cannon.png</file>
+        <file>assets/Towers/Combat Towers/spr_tower_crossbow.png</file>
+        <file>assets/Towers/Combat Towers/spr_tower_ice_wizard.png</file>
+        <file>assets/Towers/Combat Towers/spr_tower_lightning_tower.png</file>
+        <file>assets/Towers/Combat Towers/spr_tower_poison_wizard.png</file>
+        <file>assets/Towers/Non-Combat Towers/spr_normal_tower_01_blue.png</file>
+        <file>assets/Towers/Non-Combat Towers/spr_normal_tower_01_green.png</file>
+        <file>assets/Towers/Non-Combat Towers/spr_normal_tower_01_red.png</file>
+        <file>assets/Towers/Non-Combat Towers/spr_normal_tower_02_blue.png</file>
+        <file>assets/Towers/Non-Combat Towers/spr_normal_tower_02_green.png</file>
+        <file>assets/Towers/Non-Combat Towers/spr_normal_tower_02_red.png</file>
     </qresource>
 </RCC>
