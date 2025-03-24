@@ -14,6 +14,7 @@ class AnimatedEnemy(GameUnit):
             frame_duration=200
         )
         self.hp = 100
+        self.max_hp = 100  # Maksymalne życie wroga
 
         self.path = path
         self.path_index = 0
@@ -47,6 +48,17 @@ class AnimatedEnemy(GameUnit):
                 self.setPos(self.x() + step_x, self.y() + step_y)
         else:
             self.scene.decrease_lives()
+            self.scene.remove_health_bar(self)  # Usuń pasek życia
             self.scene.removeItem(self) 
             self.move_timer.stop()
+
+    def take_damage(self, damage):
+        """Zmniejsza życie wroga i aktualizuje pasek życia."""
+        self.hp -= damage
+        if self.hp <= 0:
+            self.scene.remove_health_bar(self)  # Usuń pasek życia
+            self.scene.removeItem(self)  # Usuń wroga
+            self.move_timer.stop()
+        else:
+            self.scene.update_health_bar(self)  # Aktualizuj pasek życia
 

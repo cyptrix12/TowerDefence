@@ -13,5 +13,5 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     game = Game()
     game.scene.addEnemy()
-    game.scene.addTower(1,1)
+    game.scene.addTower(4,4)
     sys.exit(app.exec_())

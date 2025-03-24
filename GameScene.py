@@ -1,14 +1,11 @@
-from PyQt5.QtWidgets import QGraphicsScene, QGraphicsTextItem, QGraphicsPixmapItem
+from PyQt5.QtWidgets import QGraphicsScene, QGraphicsTextItem, QGraphicsPixmapItem, QGraphicsRectItem
 from PyQt5.QtGui import QPixmap, QFont, QColor
 from PyQt5.QtCore import QPointF
 from Enemies import AnimatedEnemy
 from Towers import AnimatedTower
 
 import assets_rc
-
-GRID_SIZE = 100
-GRID_WIDTH = 10
-GRID_HEIGHT = 10
+from config import GRID_WIDTH, GRID_HEIGHT, GRID_SIZE
 
 class GameScene(QGraphicsScene):
     def __init__(self, parent=None):
@@ -25,6 +22,9 @@ class GameScene(QGraphicsScene):
         self.lives_text.setFont(QFont("Arial", 16))
         self.lives_text.setPos(GRID_WIDTH * GRID_SIZE - 150, 10)
         self.addItem(self.lives_text)
+
+        self.health_bars = {}  # Słownik przechowujący paski życia
+        self.enemy_class = AnimatedEnemy  # Referencja do klasy wroga
 
     def init_grid(self):
         for x in range(GRID_WIDTH):
@@ -50,7 +50,34 @@ class GameScene(QGraphicsScene):
     def addEnemy(self):
         enemy = AnimatedEnemy(self.path[0][0], self.path[0][1], self.path, self)
         self.addItem(enemy)
-    
+        self.add_health_bar(enemy)  # Dodaj pasek życia dla wroga
+
     def addTower(self, x=0, y=0):
-        tower = AnimatedTower(x, y)
+        tower = AnimatedTower(x, y, self)
         self.addItem(tower)
+
+    def add_health_bar(self, enemy):
+        """Dodaje pasek życia nad wrogiem."""
+        health_bar = QGraphicsRectItem(0, -10, GRID_SIZE, 5)  # Pasek nad wrogiem
+        health_bar.setBrush(QColor(0, 255, 0))  # Zielony kolor
+        health_bar.setParentItem(enemy)  # Pasek życia jest dzieckiem wroga
+        self.health_bars[enemy] = health_bar  # Przechowuj pasek w słowniku
+
+    def update_health_bar(self, enemy):
+        """Aktualizuje pasek życia wroga."""
+        if enemy in self.health_bars:
+            health_bar = self.health_bars[enemy]
+            health_percentage = max(enemy.hp / enemy.max_hp, 0)  # Procent życia
+            health_bar.setRect(0, -10, GRID_SIZE * health_percentage, 5)  # Zmiana szerokości
+            if health_percentage > 0.5:
+                health_bar.setBrush(QColor(0, 255, 0))  # Zielony
+            elif health_percentage > 0.2:
+                health_bar.setBrush(QColor(255, 165, 0))  # Pomarańczowy
+            else:
+                health_bar.setBrush(QColor(255, 0, 0))  # Czerwony
+
+    def remove_health_bar(self, enemy):
+        """Usuwa pasek życia wroga."""
+        if enemy in self.health_bars:
+            health_bar = self.health_bars.pop(enemy)
+            self.removeItem(health_bar)
