@@ -8,12 +8,10 @@ from PyQt5.QtCore import Qt, QRectF, QTimer
 
 import assets_rc
 
-# Stałe dla planszy
 GRID_SIZE = 100
 GRID_WIDTH = 10
 GRID_HEIGHT = 10
 
-# Kolory
 GRAY = QColor(200, 200, 200)
 DARK_GRAY = QColor(150, 150, 150)
 BROWN = QColor(139, 69, 19)
@@ -138,6 +136,8 @@ class GameScene(QGraphicsScene):
         
 
         self.addItem(AnimatedEnemy(self.path[0][0], self.path[0][1], self.path, self))
+        self.addItem(AnimatedEnemy(self.path[1][0], self.path[1][1], self.path, self))
+        self.addItem(AnimatedEnemy(self.path[2][0], self.path[2][1], self.path, self))
         self.addItem(AnimatedTower(3, 3))
         
     def decrease_lives(self):
