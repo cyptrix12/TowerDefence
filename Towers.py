@@ -1,6 +1,9 @@
 from PyQt5.QtCore import QTimer, QPointF
+from PyQt5.QtGui import QColor
+from PyQt5.QtWidgets import QGraphicsEllipseItem
 from GameUnit import GameUnit
 from config import GRID_SIZE
+from Projectile import Projectile
 
 import assets_rc
 
@@ -14,7 +17,7 @@ class AnimatedTower(GameUnit):
         )
         self.scene = scene
         self.range = 3 * GRID_SIZE  # Zasięg wieży w pikselach
-        self.damage = 30  # Obrażenia zadawane na sekundę
+        self.damage = 10  # Obrażenia zadawane przez pocisk
 
         # Timer do atakowania wrogów
         self.attack_timer = QTimer()
@@ -22,12 +25,17 @@ class AnimatedTower(GameUnit):
         self.attack_timer.start(1000)  # Atak co 1000 ms (1 sekunda)
 
     def attack_enemies(self):
-        """Sprawdza wrogów w zasięgu i zadaje im obrażenia."""
+        """Sprawdza wrogów w zasięgu i tworzy pocisk w ich kierunku."""
         for enemy in self.scene.items():
             if isinstance(enemy, GameUnit) and isinstance(enemy, self.scene.enemy_class):  # Sprawdź, czy to wróg
                 distance = self.distance_to(enemy)
                 if distance <= self.range:
-                    enemy.take_damage(self.damage)
+                    self.create_projectile(enemy)
+
+    def create_projectile(self, target):
+        """Tworzy pocisk i kieruje go w stronę celu."""
+        projectile = Projectile(self.x() + GRID_SIZE / 2, self.y() + GRID_SIZE / 2, target, self.damage, self.scene)
+        self.scene.addItem(projectile)
 
     def distance_to(self, target):
         """Oblicza odległość od wieży do celu."""

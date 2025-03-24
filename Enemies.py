@@ -18,7 +18,7 @@ class AnimatedEnemy(GameUnit):
 
         self.path = path
         self.path_index = 0
-        self.speed = 2  
+        self.speed = 7
         self.scene = scene 
 
         self.target_x = x * GRID_SIZE

@@ -3,6 +3,7 @@ from PyQt5.QtGui import QPixmap, QFont, QColor
 from PyQt5.QtCore import QPointF
 from Enemies import AnimatedEnemy
 from Towers import AnimatedTower
+from Projectile import Projectile
 
 import assets_rc
 from config import GRID_WIDTH, GRID_HEIGHT, GRID_SIZE
