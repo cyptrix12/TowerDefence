@@ -1,8 +1,9 @@
 import sys
 from PyQt5.QtWidgets import (
-    QApplication, QGraphicsScene, QGraphicsView, QGraphicsRectItem, QGraphicsItem, QGraphicsPixmapItem
+    QApplication, QGraphicsScene, QGraphicsView, QGraphicsRectItem, QGraphicsItem, QGraphicsPixmapItem , QGraphicsTextItem
+    
 )
-from PyQt5.QtGui import QBrush, QColor, QPen, QPainter, QPixmap
+from PyQt5.QtGui import QBrush, QColor, QPen, QPainter, QPixmap, QFont
 from PyQt5.QtCore import Qt, QRectF, QTimer
 
 import assets_rc
@@ -31,14 +32,12 @@ class GameUnit(QGraphicsItem):
         self.grid_y = y
         self.setPos(x * GRID_SIZE, y * GRID_SIZE)
 
-        # Ładowanie sprite sheeta
         self.sprite_sheet = QPixmap(sprite_path)
         self.frame_count = frame_count
         self.frame_index = 0
         self.frame_width = self.sprite_sheet.width() // frame_count
         self.frame_height = self.sprite_sheet.height()
 
-        # Animacja
         self.timer = QTimer()
         if frame_duration > 0:
             self.timer.timeout.connect(self.next_frame)
@@ -57,26 +56,56 @@ class GameUnit(QGraphicsItem):
         return frame.scaled(
             GRID_SIZE, GRID_SIZE,
             Qt.KeepAspectRatio,
-            Qt.FastTransformation  # zachowanie pixel-artu
+            Qt.FastTransformation
         )
 
     def next_frame(self):
         self.frame_index = (self.frame_index + 1) % self.frame_count
-        self.update()  # wywołuje repaint()
-
-
+        self.update()
 
 
 class AnimatedEnemy(GameUnit):
-    def __init__(self, x, y):
+    def __init__(self, x, y, path, scene):
         super().__init__(
             x, y,
             sprite_path=":/assets/Enemies/spr_bat.png",
             frame_count=4,
             frame_duration=200
         )
-        # Możesz dodać np. self.hp = 100, self.speed = 2 itd.
+        self.path = path
+        self.path_index = 0
+        self.speed = 2  
+        self.scene = scene 
 
+        self.target_x = x * GRID_SIZE
+        self.target_y = y * GRID_SIZE
+
+        self.move_timer = QTimer()
+        self.move_timer.timeout.connect(self.follow_path)
+        self.move_timer.start(16)  # (60 FPS)
+
+    def follow_path(self):
+        if self.path_index < len(self.path):
+            target_grid_pos = self.path[self.path_index]
+            self.target_x = target_grid_pos[0] * GRID_SIZE
+            self.target_y = target_grid_pos[1] * GRID_SIZE
+
+            dx = self.target_x - self.x()
+            dy = self.target_y - self.y()
+
+            distance = (dx**2 + dy**2)**0.5
+
+            if distance < self.speed:
+                self.setPos(self.target_x, self.target_y)
+                self.path_index += 1
+            else:
+                step_x = self.speed * dx / distance
+                step_y = self.speed * dy / distance
+                self.setPos(self.x() + step_x, self.y() + step_y)
+        else:
+            self.scene.decrease_lives()
+            self.scene.removeItem(self) 
+            self.move_timer.stop()
 
 
 class AnimatedTower(GameUnit):
@@ -94,17 +123,35 @@ class GameScene(QGraphicsScene):
         super().__init__(parent)
         self.setSceneRect(0, 0, GRID_WIDTH * GRID_SIZE, GRID_HEIGHT * GRID_SIZE)
         self.selected_tiles = set()
-        self.init_grid()
+        self.lives = 3
+        self.path = [
+            (0, 5), (1, 5), (2, 5), (3, 5), (3, 4), (3, 3), (4, 3), (5, 3),
+            (5, 4), (5, 5), (6, 5), (7, 5), (8, 5), (9, 5)
+        ]
+        self.init_grid(self.path)
 
-        self.addItem(AnimatedEnemy(1, 1))
+        self.lives_text = QGraphicsTextItem(f"Lives: {self.lives}")
+        self.lives_text.setDefaultTextColor(Qt.red)
+        self.lives_text.setFont(QFont("Arial", 16))
+        self.lives_text.setPos(GRID_WIDTH * GRID_SIZE - 150, 10)
+        self.addItem(self.lives_text)
+        
+
+        self.addItem(AnimatedEnemy(self.path[0][0], self.path[0][1], self.path, self))
         self.addItem(AnimatedTower(3, 3))
+        
+    def decrease_lives(self):
+        self.lives -= 1
+        self.lives_text.setPlainText(f"Lives: {self.lives}")
+        if self.lives <= 0:
+            print("Game Over!")
 
-    def init_grid(self):
+    def init_grid(self, path=None):
         for x in range(GRID_WIDTH):
             for y in range(GRID_HEIGHT):
                 tile = QGraphicsRectItem(x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE)
-                if y == GRID_HEIGHT // 2:
-                    tile.setBrush(QBrush(BROWN))
+                if (x,y) in path:
+                    tile.setBrush(QBrush(GREEN))
                 else:
                     tile.setBrush(QBrush(GRAY))
                 tile.setPen(DARK_GRAY)
@@ -118,7 +165,7 @@ class GameScene(QGraphicsScene):
         if item and isinstance(item, QGraphicsRectItem):
             pos = item.data(0)
             if pos in self.selected_tiles:
-                item.setBrush(QBrush(GRAY if pos[1] != GRID_HEIGHT // 2 else BROWN))
+                item.setBrush(QBrush(GREEN if pos in self.path else GRAY))
                 self.selected_tiles.remove(pos)
             else:
                 item.setBrush(QBrush(RED))
