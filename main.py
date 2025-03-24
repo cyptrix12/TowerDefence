@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import (
     
 )
 from PyQt5.QtGui import QBrush, QColor, QPen, QPainter, QPixmap, QFont
-from PyQt5.QtCore import Qt, QRectF, QTimer
+from PyQt5.QtCore import Qt, QRectF, QTimer, QPointF
 
 import assets_rc
 
@@ -135,10 +135,10 @@ class GameScene(QGraphicsScene):
         self.addItem(self.lives_text)
         
 
-        self.addItem(AnimatedEnemy(self.path[0][0], self.path[0][1], self.path, self))
-        self.addItem(AnimatedEnemy(self.path[1][0], self.path[1][1], self.path, self))
-        self.addItem(AnimatedEnemy(self.path[2][0], self.path[2][1], self.path, self))
-        self.addItem(AnimatedTower(3, 3))
+        # self.addItem(AnimatedEnemy(self.path[0][0], self.path[0][1], self.path, self))
+        # self.addItem(AnimatedEnemy(self.path[1][0], self.path[1][1], self.path, self))
+        # self.addItem(AnimatedEnemy(self.path[2][0], self.path[2][1], self.path, self))
+        # self.addItem(AnimatedTower(3, 3))
         
     def decrease_lives(self):
         self.lives -= 1
@@ -149,16 +149,19 @@ class GameScene(QGraphicsScene):
     def init_grid(self, path=None):
         for x in range(GRID_WIDTH):
             for y in range(GRID_HEIGHT):
-                tile = QGraphicsRectItem(x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE)
-                if (x,y) in path:
-                    tile.setBrush(QBrush(GREEN))
-                else:
-                    tile.setBrush(QBrush(GRAY))
-                tile.setPen(DARK_GRAY)
-                tile.setData(0, (x, y))
-                tile.setAcceptHoverEvents(True)
-                tile.setFlag(QGraphicsRectItem.ItemIsSelectable)
-                self.addItem(tile)
+                pos = QPointF(x * GRID_SIZE, y * GRID_SIZE)
+                bg_pixmap = QPixmap(":/assets/Environment/Grass/spr_grass_01.png").scaled(GRID_SIZE, GRID_SIZE)
+                bg_item = QGraphicsPixmapItem(bg_pixmap)
+                bg_item.setPos(pos)
+                self.addItem(bg_item)
+                
+                if (x, y) in path:
+                    overlay_pixmap = QPixmap(":/assets/Environment/Tile Set/spr_tile_set_ground.png").scaled(GRID_SIZE, GRID_SIZE)
+                    overlay_item = QGraphicsPixmapItem(overlay_pixmap)
+                    overlay_item.setPos(pos)
+                    self.addItem(overlay_item)
+
+
 
     def mousePressEvent(self, event):
         item = self.itemAt(event.scenePos(), self.views()[0].transform())
@@ -172,6 +175,14 @@ class GameScene(QGraphicsScene):
                 self.selected_tiles.add(pos)
         super().mousePressEvent(event)
 
+    def addEnemy(self):
+        enemy = AnimatedEnemy(self.path[0][0], self.path[0][1], self.path, self)
+        self.addItem(enemy)
+    
+    def addTower(self):
+        tower = AnimatedTower(2, 3)
+        self.addItem(tower)
+
 
 class GameView(QGraphicsView):
     def __init__(self, scene):
@@ -179,10 +190,16 @@ class GameView(QGraphicsView):
         self.setFixedSize(GRID_WIDTH * GRID_SIZE + 2, GRID_HEIGHT * GRID_SIZE + 2)
         self.setWindowTitle("Tower Defense")
 
+class Game():
+    def __init__(self):
+        self.scene = GameScene()
+        self.view = GameView(self.scene)
+        self.view.show()
+        self.scene.addEnemy()
+        self.scene.addTower()
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    scene = GameScene()
-    view = GameView(scene)
-    view.show()
+    game = Game()
     sys.exit(app.exec_())
