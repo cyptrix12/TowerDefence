@@ -17,6 +17,8 @@ class GameScene(QGraphicsScene):
             (0, 5), (1, 5), (2, 5), (3, 5), (3, 4), (3, 3), (4, 3), (5, 3),
             (5, 4), (5, 5), (6, 5), (7, 5), (8, 5), (9, 5)
         ]
+        self.path_tiles = []  # Lista przechowująca 9 kwadratów ścieżki
+        self.init_path_tiles()
         self.init_grid()
         self.lives_text = QGraphicsTextItem(f"Lives: {self.lives}")
         self.lives_text.setDefaultTextColor(QColor(255, 0, 0))
@@ -26,6 +28,14 @@ class GameScene(QGraphicsScene):
 
         self.health_bars = {}  # Słownik przechowujący paski życia
         self.enemy_class = AnimatedEnemy  # Referencja do klasy wroga
+
+    def init_path_tiles(self):
+        """Inicjalizuje listę 9 kwadratów wyciętych z obrazka ścieżki."""
+        overlay_pixmap = QPixmap(":/assets/Environment/Tile Set/spr_tile_set_ground.png").scaled(GRID_SIZE * 3, GRID_SIZE * 3)
+        self.path_tiles = [
+            overlay_pixmap.copy(x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE)
+            for y in range(3) for x in range(3)
+        ]
 
     def init_grid(self):
         for x in range(GRID_WIDTH):
@@ -37,8 +47,18 @@ class GameScene(QGraphicsScene):
                 self.addItem(bg_item)
 
                 if (x, y) in self.path:
-                    overlay_pixmap = QPixmap(":/assets/Environment/Tile Set/spr_tile_set_ground.png").scaled(GRID_SIZE, GRID_SIZE)
-                    overlay_item = QGraphicsPixmapItem(overlay_pixmap)
+                    if (x+1,y) in self.path and (x,y+1) in self.path:
+                        overlay_item = QGraphicsPixmapItem(self.path_tiles[0])
+                    elif (x+1,y) in self.path and (x,y-1) in self.path:
+                        overlay_item = QGraphicsPixmapItem(self.path_tiles[6])
+                    elif (x-1,y) in self.path and (x,y+1) in self.path:
+                        overlay_item = QGraphicsPixmapItem(self.path_tiles[2])
+                    elif (x-1,y) in self.path and (x,y-1) in self.path:
+                        overlay_item = QGraphicsPixmapItem(self.path_tiles[8])
+                    elif (x+1,y) in self.path or (x-1,y) in self.path:
+                        overlay_item = QGraphicsPixmapItem(self.path_tiles[1])
+                    else:
+                        overlay_item = QGraphicsPixmapItem(self.path_tiles[3])
                     overlay_item.setPos(pos)
                     self.addItem(overlay_item)
 
