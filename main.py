@@ -8,10 +8,11 @@ class Game:
         self.scene = GameScene()
         self.view = GameView(self.scene)
         self.view.show()
+        self.view.setMouseTracking(True)  # Włącz śledzenie myszy
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     game = Game()
     game.scene.addEnemy()
-    game.scene.addTower(4,4)
+    game.scene.addTower(4, 4)
     sys.exit(app.exec_())

@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsTextItem, QGraphicsPixmapItem, QGraphicsRectItem
 from PyQt5.QtGui import QPixmap, QFont, QColor
-from PyQt5.QtCore import QPointF
+from PyQt5.QtCore import QPointF, Qt, QEvent
 from Enemies import AnimatedEnemy
 from Towers import AnimatedTower
 from Projectile import Projectile
@@ -28,6 +28,7 @@ class GameScene(QGraphicsScene):
 
         self.health_bars = {}  # Słownik przechowujący paski życia
         self.enemy_class = AnimatedEnemy  # Referencja do klasy wroga
+        self.installEventFilter(self)  # Zainstaluj filtr zdarzeń na GameScene
 
     def init_path_tiles(self):
         """Inicjalizuje listę 9 kwadratów wyciętych z obrazka ścieżki."""
@@ -102,3 +103,16 @@ class GameScene(QGraphicsScene):
         if enemy in self.health_bars:
             health_bar = self.health_bars.pop(enemy)
             self.removeItem(health_bar)
+
+    def eventFilter(self, source, event):
+        """Obsługuje kliknięcie myszką, aby postawić wieżę."""
+        if event.type() == QEvent.GraphicsSceneMousePress:
+            if event.button() == Qt.LeftButton:
+                print("Mouse click detected in GameScene")
+                pos = event.scenePos()
+                x = int(pos.x() // GRID_SIZE)
+                y = int(pos.y() // GRID_SIZE)
+                if (x, y) not in self.path:  # Upewnij się, że nie stawiamy wieży na ścieżce
+                    self.addTower(x, y)
+                return True  # Zdarzenie zostało obsłużone
+        return super().eventFilter(source, event)
