@@ -6,7 +6,7 @@ from GameUnit import GameUnit
 import assets_rc
 
 class AnimatedEnemy(GameUnit):
-    def __init__(self, x, y, path, scene):
+    def __init__(self, x, y, path, scene, controller):
         super().__init__(
             x, y,
             sprite_path=":/assets/Enemies/spr_bat.png",
@@ -20,6 +20,8 @@ class AnimatedEnemy(GameUnit):
         self.path_index = 0
         self.speed = 7
         self.scene = scene 
+        self.controller = controller
+
 
         self.target_x = x * GRID_SIZE
         self.target_y = y * GRID_SIZE
@@ -47,7 +49,7 @@ class AnimatedEnemy(GameUnit):
                 step_y = self.speed * dy / distance
                 self.setPos(self.x() + step_x, self.y() + step_y)
         else:
-            self.scene.decrease_lives()
+            self.controller.decrease_lives()
             self.scene.remove_health_bar(self)  # Usuń pasek życia
             self.scene.removeItem(self) 
             self.move_timer.stop()

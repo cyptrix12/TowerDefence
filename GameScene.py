@@ -9,10 +9,10 @@ import assets_rc
 from config import GRID_WIDTH, GRID_HEIGHT, GRID_SIZE
 
 class GameScene(QGraphicsScene):
-    def __init__(self, parent=None):
+    def __init__(self, controller, parent=None):
         super().__init__(parent)
+        self.controller = controller  # Referencja do GameController
         self.setSceneRect(0, 0, GRID_WIDTH * GRID_SIZE, GRID_HEIGHT * GRID_SIZE)
-        self.lives = 3
         self.path = [
             (0, 5), (1, 5), (2, 5), (3, 5), (3, 4), (3, 3), (4, 3), (5, 3),
             (5, 4), (5, 5), (6, 5), (7, 5), (8, 5), (9, 5)
@@ -20,7 +20,7 @@ class GameScene(QGraphicsScene):
         self.path_tiles = []  # Lista przechowująca 9 kwadratów ścieżki
         self.init_path_tiles()
         self.init_grid()
-        self.lives_text = QGraphicsTextItem(f"Lives: {self.lives}")
+        self.lives_text = QGraphicsTextItem(f"Lives: {0}")
         self.lives_text.setDefaultTextColor(QColor(255, 0, 0))
         self.lives_text.setFont(QFont("Arial", 16))
         self.lives_text.setPos(GRID_WIDTH * GRID_SIZE - 150, 10)
@@ -63,20 +63,6 @@ class GameScene(QGraphicsScene):
                     overlay_item.setPos(pos)
                     self.addItem(overlay_item)
 
-    def decrease_lives(self):
-        self.lives -= 1
-        self.lives_text.setPlainText(f"Lives: {self.lives}")
-        if self.lives <= 0:
-            print("Game Over!")
-
-    def addEnemy(self):
-        enemy = AnimatedEnemy(self.path[0][0], self.path[0][1], self.path, self)
-        self.addItem(enemy)
-        self.add_health_bar(enemy)  # Dodaj pasek życia dla wroga
-
-    def addTower(self, x=0, y=0):
-        tower = AnimatedTower(x, y, self)
-        self.addItem(tower)
 
     def add_health_bar(self, enemy):
         """Dodaje pasek życia nad wrogiem."""
@@ -105,14 +91,8 @@ class GameScene(QGraphicsScene):
             self.removeItem(health_bar)
 
     def eventFilter(self, source, event):
-        """Obsługuje kliknięcie myszką, aby postawić wieżę."""
+        """Przekazuje zdarzenia do kontrolera."""
         if event.type() == QEvent.GraphicsSceneMousePress:
             if event.button() == Qt.LeftButton:
-                print("Mouse click detected in GameScene")
-                pos = event.scenePos()
-                x = int(pos.x() // GRID_SIZE)
-                y = int(pos.y() // GRID_SIZE)
-                if (x, y) not in self.path:  # Upewnij się, że nie stawiamy wieży na ścieżce
-                    self.addTower(x, y)
-                return True  # Zdarzenie zostało obsłużone
+                return self.controller.handle_mouse_event(event)  # Przekaż zdarzenie do kontrolera
         return super().eventFilter(source, event)
