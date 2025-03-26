@@ -26,11 +26,18 @@ class AnimatedTower(GameUnit):
 
     def attack_enemies(self):
         """Sprawdza wrogów w zasięgu i tworzy pocisk w ich kierunku."""
+        nearest_enemy = None
+        nearest_distance = float('inf')
+
         for enemy in self.scene.items():
             if isinstance(enemy, GameUnit) and isinstance(enemy, self.scene.enemy_class):  # Sprawdź, czy to wróg
                 distance = self.distance_to(enemy)
-                if distance <= self.range:
-                    self.create_projectile(enemy)
+                if distance < nearest_distance:
+                    nearest_distance = distance
+                    nearest_enemy = enemy
+
+        if nearest_distance <= self.range:
+            self.create_projectile(nearest_enemy)
 
     def create_projectile(self, target):
         """Tworzy pocisk i kieruje go w stronę celu."""
