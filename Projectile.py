@@ -1,17 +1,24 @@
-from PyQt5.QtCore import QTimer, QPointF
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QGraphicsEllipseItem
+from PyQt5.QtCore import QTimer, QLineF
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QGraphicsPixmapItem
 
-class Projectile(QGraphicsEllipseItem):
+import assets_rc
+
+class Projectile(QGraphicsPixmapItem):
     def __init__(self, x, y, target, damage, scene):
-        super().__init__(-5, -5, 10, 10) # 10x10 px elips
-        self.setBrush(QColor(255, 0, 0))  # Red
+        super().__init__()
+        self.setPixmap(QPixmap(":/assets/Towers/Combat Towers Projectiles/spr_tower_archer_projectile.png").scaled(50, 50))
         self.setPos(x, y)
 
         self.target = target
         self.damage = damage
         self.scene = scene
-        self.speed = 10 
+        self.speed = 10  
+
+        dx = self.target.x() - self.x()
+        dy = self.target.y() - self.y()
+        angle = QLineF(0, 0, dx, dy).angle() 
+        self.setRotation(-angle)
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.move)
@@ -26,10 +33,12 @@ class Projectile(QGraphicsEllipseItem):
         dx = self.target.x() - self.x()
         dy = self.target.y() - self.y()
         distance = (dx**2 + dy**2)**0.5
+        angle = QLineF(0, 0, dx, dy).angle()  
+        self.setRotation(-angle)  
 
         if distance < self.speed:
-            self.target.take_damage(self.damage) 
-            self.scene.removeItem(self)
+            self.target.take_damage(self.damage)  
+            self.scene.removeItem(self)  
             self.timer.stop()
         else:
             step_x = self.speed * dx / distance
