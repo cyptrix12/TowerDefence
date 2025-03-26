@@ -8,17 +8,16 @@ class GameController:
         self.scene = scene
         self.lives = 3
         self.updateLifes()
-        self.addEnemy()  # Dodaj pierwszego wroga
+        self.addEnemy()
     
 
     def handle_mouse_event(self, event):
-        """Obsługuje zdarzenia myszy."""
         pos = event.scenePos()
         x = int(pos.x() // GRID_SIZE)
         y = int(pos.y() // GRID_SIZE)
-        if (x, y) not in self.scene.path:  # Upewnij się, że nie stawiamy wieży na ścieżce
+        if (x, y) not in self.scene.path:
             self.addTower(x, y)
-            return True  # Zdarzenie zostało obsłużone
+            return True 
         else:
             self.addEnemy()
             return True

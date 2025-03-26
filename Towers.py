@@ -16,21 +16,19 @@ class AnimatedTower(GameUnit):
             frame_duration=0
         )
         self.scene = scene
-        self.range = 3 * GRID_SIZE  # Zasięg wieży w pikselach
-        self.damage = 10  # Obrażenia zadawane przez pocisk
+        self.range = 3 * GRID_SIZE 
+        self.damage = 10 
 
-        # Timer do atakowania wrogów
         self.attack_timer = QTimer()
         self.attack_timer.timeout.connect(self.attack_enemies)
-        self.attack_timer.start(1000)  # Atak co 1000 ms (1 sekunda)
+        self.attack_timer.start(1000) 
 
     def attack_enemies(self):
-        """Sprawdza wrogów w zasięgu i tworzy pocisk w ich kierunku."""
         nearest_enemy = None
         nearest_distance = float('inf')
 
         for enemy in self.scene.items():
-            if isinstance(enemy, GameUnit) and isinstance(enemy, self.scene.enemy_class):  # Sprawdź, czy to wróg
+            if isinstance(enemy, GameUnit) and isinstance(enemy, self.scene.enemy_class): 
                 distance = self.distance_to(enemy)
                 if distance < nearest_distance:
                     nearest_distance = distance
@@ -40,12 +38,10 @@ class AnimatedTower(GameUnit):
             self.create_projectile(nearest_enemy)
 
     def create_projectile(self, target):
-        """Tworzy pocisk i kieruje go w stronę celu."""
         projectile = Projectile(self.x() + GRID_SIZE / 2, self.y() + GRID_SIZE / 2, target, self.damage, self.scene)
         self.scene.addItem(projectile)
 
     def distance_to(self, target):
-        """Oblicza odległość od wieży do celu."""
         dx = (target.x() - self.x())
         dy = (target.y() - self.y())
         return (dx**2 + dy**2)**0.5

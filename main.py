@@ -6,9 +6,9 @@ from GameController import GameController
 
 class Game:
     def __init__(self):
-        self.scene = GameScene(None)  # Tymczasowo None
-        self.controller = GameController(self.scene)  # Inicjalizacja kontrolera
-        self.scene.controller = self.controller  # Przypisz kontroler do sceny
+        self.scene = GameScene(None)
+        self.controller = GameController(self.scene) 
+        self.scene.controller = self.controller 
         self.view = GameView(self.scene)
         self.view.show()
         self.view.setMouseTracking(True)
