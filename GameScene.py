@@ -87,7 +87,8 @@ class GameScene(QGraphicsScene):
             self.removeItem(health_bar)
 
     def eventFilter(self, source, event):
-        if event.type() == QEvent.GraphicsSceneMousePress:
-            if event.button() == Qt.LeftButton:
-                return self.controller.handle_mouse_event(event)
+        if self.controller:
+            handled = self.controller.EventFilter(source, event)
+            if handled is not None:
+                return handled
         return super().eventFilter(source, event)

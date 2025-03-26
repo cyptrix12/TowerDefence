@@ -1,3 +1,5 @@
+from PyQt5.QtCore import Qt, QEvent
+
 from Towers import AnimatedTower
 from Enemies import AnimatedEnemy
 
@@ -9,6 +11,12 @@ class GameController:
         self.lives = 3
         self.updateLifes()
         self.addEnemy()
+
+    def EventFilter(self, obj, event):
+        if event.type() == QEvent.GraphicsSceneMousePress:
+            if event.button() == Qt.LeftButton:
+                return self.handle_mouse_event(event)
+        return False
     
 
     def handle_mouse_event(self, event):
