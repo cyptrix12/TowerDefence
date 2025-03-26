@@ -1,13 +1,14 @@
 from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import QTimer, QRectF, Qt
+from config import GRID_SIZE  # Importuj GRID_SIZE z pliku konfiguracyjnego
 
 class GameUnit(QGraphicsItem):
     def __init__(self, x, y, sprite_path, frame_count=1, frame_duration=0, parent=None):
         super().__init__(parent)
         self.grid_x = x
         self.grid_y = y
-        self.setPos(x * 100, y * 100)
+        self.setPos(x * GRID_SIZE, y * GRID_SIZE)  # Użyj GRID_SIZE
 
         self.sprite_sheet = QPixmap(sprite_path)
         self.frame_count = frame_count
@@ -21,7 +22,7 @@ class GameUnit(QGraphicsItem):
             self.timer.start(frame_duration)
 
     def boundingRect(self):
-        return QRectF(0, 0, 100, 100)
+        return QRectF(0, 0, GRID_SIZE, GRID_SIZE)  # Użyj GRID_SIZE
 
     def paint(self, painter, option, widget):
         frame = self.get_current_frame()
@@ -30,7 +31,7 @@ class GameUnit(QGraphicsItem):
     def get_current_frame(self):
         x = self.frame_index * self.frame_width
         frame = self.sprite_sheet.copy(x, 0, self.frame_width, self.frame_height)
-        return frame.scaled(100, 100, Qt.KeepAspectRatio, Qt.FastTransformation)
+        return frame.scaled(GRID_SIZE, GRID_SIZE, Qt.KeepAspectRatio, Qt.FastTransformation)  # Użyj GRID_SIZE
 
     def next_frame(self):
         self.frame_index = (self.frame_index + 1) % self.frame_count
