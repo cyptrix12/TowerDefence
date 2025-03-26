@@ -11,9 +11,9 @@ class AnimatedTower(GameUnit):
     def __init__(self, x, y, scene):
         super().__init__(
             x, y,
-            sprite_path=":/assets/Towers/Castle/spr_castle_blue.png",
-            frame_count=4,
-            frame_duration=200
+            sprite_path=":/assets/Towers/Combat Towers/spr_tower_lightning_tower.png",
+            frame_count=1,
+            frame_duration=0
         )
         self.scene = scene
         self.range = 3 * GRID_SIZE  # Zasięg wieży w pikselach

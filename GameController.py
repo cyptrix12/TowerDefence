@@ -19,6 +19,9 @@ class GameController:
         if (x, y) not in self.scene.path:  # Upewnij się, że nie stawiamy wieży na ścieżce
             self.addTower(x, y)
             return True  # Zdarzenie zostało obsłużone
+        else:
+            self.addEnemy()
+            return True
         return False
 
     def addTower(self, x, y):
