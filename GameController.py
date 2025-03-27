@@ -24,6 +24,7 @@ class GameController:
         x = int(pos.x() // GRID_SIZE)
         y = int(pos.y() // GRID_SIZE)
         if(x,y) == (0,0):
+            self.scene.add_tower_palette()
             return False
         if (x, y) not in self.scene.path:
             self.addTower(x, y)
@@ -34,8 +35,13 @@ class GameController:
         return False
 
     def addTower(self, x, y):
+        if (x, y) in self.scene.tower_positions:  
+            return
+        if (x, y) in self.scene.path:
+            return
         tower = AnimatedTower(x, y, self.scene)
         self.scene.addItem(tower)
+        self.scene.tower_positions.add((x, y))  
 
     def addEnemy(self):
         enemy = AnimatedEnemy(self.scene.path[0][0], self.scene.path[0][1], self.scene.path, self.scene, self)

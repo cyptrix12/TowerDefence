@@ -30,6 +30,9 @@ class GameScene(QGraphicsScene):
         self.enemy_class = AnimatedEnemy
         self.installEventFilter(self)
 
+        self.tower_positions = set()
+
+        self.tower_pallete = None
         self.add_tower_palette()
 
     def init_path_tiles(self):
@@ -106,4 +109,16 @@ class GameScene(QGraphicsScene):
         tower_palette.setFlag(QGraphicsItem.ItemIsMovable, True)
         tower_palette.setFlag(QGraphicsItem.ItemIsSelectable, True)
 
+        self.tower_pallete = tower_palette
         self.addItem(tower_palette)
+
+    def mouseReleaseEvent(self, event):
+        if self.tower_pallete.isUnderMouse():
+            pos = event.scenePos()
+            x = int(pos.x() // GRID_SIZE)
+            y = int(pos.y() // GRID_SIZE)
+            if (x, y) not in self.path:
+                self.controller.addTower(x, y)
+            self.removeItem(self.tower_pallete)
+            self.add_tower_palette()
+            return
