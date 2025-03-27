@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QGraphicsScene, QGraphicsTextItem, QGraphicsPixmapItem, QGraphicsRectItem
+from PyQt5.QtWidgets import QGraphicsScene, QGraphicsTextItem, QGraphicsPixmapItem, QGraphicsRectItem, QGraphicsItem
 from PyQt5.QtGui import QPixmap, QFont, QColor
 from PyQt5.QtCore import QPointF, Qt, QEvent
 from Enemies import AnimatedEnemy
@@ -27,8 +27,10 @@ class GameScene(QGraphicsScene):
         self.addItem(self.lives_text)
 
         self.health_bars = {}
-        self.enemy_class = AnimatedEnemy 
+        self.enemy_class = AnimatedEnemy
         self.installEventFilter(self)
+
+        self.add_tower_palette()
 
     def init_path_tiles(self):
         overlay_pixmap = QPixmap(":/assets/Environment/Tile Set/spr_tile_set_ground.png").scaled(GRID_SIZE * 3, GRID_SIZE * 3)
@@ -91,4 +93,17 @@ class GameScene(QGraphicsScene):
             handled = self.controller.EventFilter(source, event)
             if handled is not None:
                 return handled
+
         return super().eventFilter(source, event)
+
+    def add_tower_palette(self):
+        background = QGraphicsRectItem(0, 0, GRID_SIZE, GRID_SIZE)
+        background.setBrush(QColor(255, 255, 255))  # White
+
+        self.addItem(background)
+
+        tower_palette = AnimatedTower(0, 0, self)
+        tower_palette.setFlag(QGraphicsItem.ItemIsMovable, True)
+        tower_palette.setFlag(QGraphicsItem.ItemIsSelectable, True)
+
+        self.addItem(tower_palette)

@@ -13,7 +13,7 @@ class Projectile(QGraphicsPixmapItem):
         self.target = target
         self.damage = damage
         self.scene = scene
-        self.speed = 10  
+        self.speed = 20 
 
         dx = self.target.x() - self.x()
         dy = self.target.y() - self.y()

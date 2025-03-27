@@ -1,8 +1,8 @@
-from PyQt5.QtCore import QTimer, QPointF
+from PyQt5.QtCore import QTimer, QPointF, QEvent
 from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QGraphicsEllipseItem
+from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsItem
 from GameUnit import GameUnit
-from config import GRID_SIZE
+from config import GRID_SIZE, GRID_WIDTH, GRID_HEIGHT
 from Projectile import Projectile
 
 import assets_rc
@@ -16,8 +16,11 @@ class AnimatedTower(GameUnit):
             frame_duration=0
         )
         self.scene = scene
-        self.range = 3 * GRID_SIZE 
-        self.damage = 10 
+        self.range = 3 * GRID_SIZE
+        self.damage = 10
+
+        # self.setFlag(QGraphicsItem.ItemIsMovable, True)
+        # self.setFlag(QGraphicsItem.ItemIsSelectable, True)
 
         self.attack_timer = QTimer()
         self.attack_timer.timeout.connect(self.attack_enemies)

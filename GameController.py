@@ -23,6 +23,8 @@ class GameController:
         pos = event.scenePos()
         x = int(pos.x() // GRID_SIZE)
         y = int(pos.y() // GRID_SIZE)
+        if(x,y) == (0,0):
+            return False
         if (x, y) not in self.scene.path:
             self.addTower(x, y)
             return True 
