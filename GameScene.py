@@ -8,8 +8,6 @@ from GameConfig import Config
 
 import assets_rc
 
-
-
 import random
 
 class GameScene(QGraphicsScene):
@@ -19,13 +17,19 @@ class GameScene(QGraphicsScene):
         self.GRID_WIDTH = self.config.get_grid_width()
         self.GRID_HEIGHT = self.config.get_grid_height()
 
-
         super().__init__(parent)
         self.controller = None
         self.setSceneRect(0, 0, self.GRID_WIDTH * self.GRID_SIZE, self.GRID_HEIGHT * self.GRID_SIZE)
-        self.path = self.generate_random_path()  # Generowanie losowej ścieżki
+        self.path = self.generate_random_path()
         self.path_tiles = []
         self.init_path_tiles()
+
+        self.overlay_assets = [
+            ":/assets/Environment/Decoration/spr_mushroom_01.png",
+            ":/assets/Environment/Decoration/spr_rock_01.png",
+            ":/assets/Environment/Decoration/spr_tree_01_normal.png"
+        ]
+
         self.init_grid()
         self.lives_text = QGraphicsTextItem(f"Lives: {0}")
         self.lives_text.setDefaultTextColor(QColor(255, 0, 0))
@@ -44,18 +48,16 @@ class GameScene(QGraphicsScene):
 
         self.start_button = QPushButton("START LEVEL")
         self.start_button.setGeometry(self.GRID_WIDTH * self.GRID_SIZE - 150, self.GRID_HEIGHT * self.GRID_SIZE - 50, 120, 40)
-        self.start_button.clicked.connect(self.start_level_placeholder)  # Tymczasowy placeholder
+        self.start_button.clicked.connect(self.start_level_placeholder)
         self.start_button.setParent(parent)
         self.start_button.show()
 
     def set_controller(self, controller):
-        """Przypisuje kontroler do sceny."""
         self.controller = controller
-        self.start_button.clicked.disconnect()  # Usuń placeholder
-        self.start_button.clicked.connect(self.controller.start_level)  # Połącz z metodą kontrolera
+        self.start_button.clicked.disconnect()
+        self.start_button.clicked.connect(self.controller.start_level) 
 
     def start_level_placeholder(self):
-        """Tymczasowy placeholder dla przycisku przed przypisaniem kontrolera."""
         print("Controller not set yet!")
 
     def generate_random_path(self):
@@ -69,22 +71,19 @@ class GameScene(QGraphicsScene):
         while x < self.GRID_WIDTH - 1:
             directions = []
             if x + 1 < self.GRID_WIDTH and (x + 1, y) not in visited:
-                directions.append((x + 1, y))  # Prawo
+                directions.append((x + 1, y))
             if y + 1 < self.GRID_HEIGHT and (x, y + 1) not in visited:
-                directions.append((x, y + 1))  # Dół
+                directions.append((x, y + 1))
             if y - 1 >= 0 and (x, y - 1) not in visited:
-                directions.append((x, y - 1))  # Góra
+                directions.append((x, y - 1))
 
             if not directions:
-                # Jeśli brak dostępnych kierunków, zakończ generowanie
                 break
 
-            # Wybierz losowy kierunek
             x, y = random.choice(directions)
             path.append((x, y))
             visited.add((x, y))
 
-        # Upewnij się, że ścieżka kończy się na x=self.GRID_WIDTH-1
         if path[-1][0] < self.GRID_WIDTH - 1:
             for i in range(path[-1][0] + 1, self.GRID_WIDTH):
                 path.append((i, y))
@@ -103,10 +102,18 @@ class GameScene(QGraphicsScene):
         for x in range(self.GRID_WIDTH):
             for y in range(self.GRID_HEIGHT):
                 pos = QPointF(x * self.GRID_SIZE, y * self.GRID_SIZE)
+
                 bg_pixmap = QPixmap(":/assets/Environment/Grass/spr_grass_01.png").scaled(self.GRID_SIZE, self.GRID_SIZE)
                 bg_item = QGraphicsPixmapItem(bg_pixmap)
                 bg_item.setPos(pos)
                 self.addItem(bg_item)
+
+                if (x, y) not in self.path and random.random() < 0.1:  # 10% szansy
+                    overlay_source = random.choice(self.overlay_assets)
+                    overlay_pixmap = QPixmap(overlay_source).scaled(self.GRID_SIZE//3, self.GRID_SIZE//3)
+                    overlay_item = QGraphicsPixmapItem(overlay_pixmap)
+                    overlay_item.setPos(pos)
+                    self.addItem(overlay_item)
 
         previous_pos = None
         for path_pos in self.path:
@@ -116,18 +123,18 @@ class GameScene(QGraphicsScene):
             next_path_pos = self.path[self.path.index(path_pos) + 1] if self.path.index(path_pos) + 1 < len(self.path) else (path_pos[0]+1, path_pos[1])
             pos = QPointF(x * self.GRID_SIZE, y * self.GRID_SIZE)
 
-            if previous_pos == (x, y + 1) and next_path_pos == (x + 1, y):
+            if previous_pos == (x, y + 1) and next_path_pos == (x + 1, y): #Γ
                 overlay_item = QGraphicsPixmapItem(self.path_tiles[0])
-            elif previous_pos == (x - 1, y) and next_path_pos == (x, y + 1):
+            elif previous_pos == (x - 1, y) and next_path_pos == (x, y + 1): #ㄱ
                 overlay_item = QGraphicsPixmapItem(self.path_tiles[2])
-            elif previous_pos == (x, y - 1) and next_path_pos == (x + 1, y):
+            elif previous_pos == (x, y - 1) and next_path_pos == (x + 1, y): #L
                 overlay_item = QGraphicsPixmapItem(self.path_tiles[6])
-            elif previous_pos == (x - 1, y) and next_path_pos == (x, y - 1):
+            elif previous_pos == (x - 1, y) and next_path_pos == (x, y - 1): #」
                 overlay_item = QGraphicsPixmapItem(self.path_tiles[8])
-            elif previous_pos == (x, y + 1) or previous_pos == (x, y - 1):
+            elif previous_pos == (x, y + 1) or previous_pos == (x, y - 1): #|
                 overlay_item = QGraphicsPixmapItem(self.path_tiles[3])
             else:
-                overlay_item = QGraphicsPixmapItem(self.path_tiles[1])
+                overlay_item = QGraphicsPixmapItem(self.path_tiles[1]) # -
 
             overlay_item.setPos(pos)
             self.addItem(overlay_item)
