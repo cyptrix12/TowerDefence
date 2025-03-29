@@ -12,14 +12,14 @@ class ConfigWindow(QDialog):
         # Grid Width
         self.grid_width_label = QLabel("Grid Width:")
         self.grid_width_input = QLineEdit()
-        self.grid_width_input.setText("50")  # Domyślna wartość
+        self.grid_width_input.setText("10")  # Domyślna wartość
         layout.addWidget(self.grid_width_label)
         layout.addWidget(self.grid_width_input)
 
         # Grid Height
         self.grid_height_label = QLabel("Grid Height:")
         self.grid_height_input = QLineEdit()
-        self.grid_height_input.setText("50")  # Domyślna wartość
+        self.grid_height_input.setText("10")  # Domyślna wartość
         layout.addWidget(self.grid_height_label)
         layout.addWidget(self.grid_height_input)
 
