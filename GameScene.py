@@ -24,12 +24,14 @@ class GameScene(QGraphicsScene):
         self.path_tiles = []
         self.init_path_tiles()
 
+        # Lista źródeł assetów z przypisanymi typami
         self.overlay_assets = [
-            ":/assets/Environment/Decoration/spr_mushroom_01.png",
-            ":/assets/Environment/Decoration/spr_rock_01.png",
-            ":/assets/Environment/Decoration/spr_tree_01_normal.png"
+            (":/assets/Environment/Decoration/spr_mushroom_01.png", "mushroom"),
+            (":/assets/Environment/Decoration/spr_rock_01.png", "rock"),
+            (":/assets/Environment/Decoration/spr_tree_01_normal.png", "tree")
         ]
 
+        self.overlay_items = []  # Przechowuje elementy overlay z ich typami
         self.init_grid()
         self.lives_text = QGraphicsTextItem(f"Lives: {0}")
         self.lives_text.setDefaultTextColor(QColor(255, 0, 0))
@@ -109,11 +111,14 @@ class GameScene(QGraphicsScene):
                 self.addItem(bg_item)
 
                 if (x, y) not in self.path and random.random() < 0.1:  # 10% szansy
-                    overlay_source = random.choice(self.overlay_assets)
-                    overlay_pixmap = QPixmap(overlay_source).scaled(self.GRID_SIZE//3, self.GRID_SIZE//3)
+                    overlay_source, overlay_type = random.choice(self.overlay_assets)
+                    overlay_pixmap = QPixmap(overlay_source).scaled(self.GRID_SIZE // 3, self.GRID_SIZE // 3)
                     overlay_item = QGraphicsPixmapItem(overlay_pixmap)
                     overlay_item.setPos(pos)
                     self.addItem(overlay_item)
+
+                    # Dodaj element overlay do listy
+                    self.overlay_items.append({"item": overlay_item, "type": overlay_type, "pos": (x, y)})
 
         previous_pos = None
         for path_pos in self.path:
@@ -139,6 +144,20 @@ class GameScene(QGraphicsScene):
             overlay_item.setPos(pos)
             self.addItem(overlay_item)
             previous_pos = path_pos
+
+    def get_adjacent_overlays(self, x, y):
+        """Sprawdza, jakie overlay są w odległości 1 kratki od podanej pozycji."""
+        adjacent_positions = [
+            (x - 1, y), (x + 1, y),  # Lewo, Prawo
+            (x, y - 1), (x, y + 1)   # Góra, Dół
+        ]
+        adjacent_overlays = []
+
+        for overlay in self.overlay_items:
+            if overlay["pos"] in adjacent_positions:
+                adjacent_overlays.append(overlay["type"])
+
+        return adjacent_overlays
 
     def add_health_bar(self, enemy):
         health_bar = QGraphicsRectItem(0, -10, self.GRID_SIZE, 5) 

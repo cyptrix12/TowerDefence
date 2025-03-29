@@ -43,6 +43,11 @@ class GameController:
             return
         if (x, y) in self.scene.path:
             return
+        for overlay in self.scene.overlay_items:
+            if (x, y) == overlay["pos"]:
+                return
+        if x < 0 or y < 0 or x >= self.scene.GRID_WIDTH or y >= self.scene.GRID_HEIGHT:
+            return
         tower = AnimatedTower(x, y, self.scene)
         self.scene.addItem(tower)
         self.scene.tower_positions.add((x, y))

@@ -20,14 +20,27 @@ class AnimatedTower(GameUnit):
         self.GRID_SIZE = self.config.get_grid_size()
         self.scene = scene
         self.range = 3 * self.GRID_SIZE
-        self.damage = 10
+        self.damage = 20
+        self.attack_speed = 1000  # Domyślny czas ataku w milisekundach
 
-        # self.setFlag(QGraphicsItem.ItemIsMovable, True)
-        # self.setFlag(QGraphicsItem.ItemIsSelectable, True)
+        self.apply_buffs()
 
         self.attack_timer = QTimer()
         self.attack_timer.timeout.connect(self.attack_enemies)
-        self.attack_timer.start(1000) 
+        self.attack_timer.start(self.attack_speed)
+
+    def apply_buffs(self):
+        adjacent_overlays = self.scene.get_adjacent_overlays(self.grid_x, self.grid_y)
+
+        if "mushroom" in adjacent_overlays:
+            self.attack_speed = max(500, self.attack_speed - 200)  # Zwiększ prędkość ataku
+            print("Buff: Attack speed increased!")
+        if "rock" in adjacent_overlays:
+            self.damage *= 2  # Zwiększ obrażenia
+            print("Buff: Damage increased!")
+        if "tree" in adjacent_overlays:
+            self.range = max(self.GRID_SIZE, self.range - self.GRID_SIZE)  # Zmniejsz zasięg
+            print("Buff: Range decreased!")
 
     def attack_enemies(self):
         nearest_enemy = None
