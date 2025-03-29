@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QTimer
 
-from config import GRID_SIZE
 from GameUnit import GameUnit
+from GameConfig import Config
 
 import assets_rc
 
@@ -13,18 +13,23 @@ class AnimatedEnemy(GameUnit):
             frame_count=4,
             frame_duration=200
         )
+        self.config = Config()
+        self.GRID_SIZE = self.config.get_grid_size()
+
+
         self.hp = 100
         self.max_hp = 100 
 
         self.path = path
         self.path_index = 0
-        self.speed = 7
+        self.speed = 5
+        self.speed = self.speed * self.GRID_SIZE / 50  # Speed in pixels per millisecond
         self.scene = scene 
         self.controller = controller
 
 
-        self.target_x = x * GRID_SIZE
-        self.target_y = y * GRID_SIZE
+        self.target_x = x * self.GRID_SIZE
+        self.target_y = y * self.GRID_SIZE
 
         self.move_timer = QTimer()
         self.move_timer.timeout.connect(self.follow_path)
@@ -44,20 +49,24 @@ class AnimatedEnemy(GameUnit):
     def follow_path(self):
         if self.path_index < len(self.path):
             target_grid_pos = self.path[self.path_index]
-            self.target_x = target_grid_pos[0] * GRID_SIZE
-            self.target_y = target_grid_pos[1] * GRID_SIZE
+            self.target_x = target_grid_pos[0] * self.GRID_SIZE
+            self.target_y = target_grid_pos[1] * self.GRID_SIZE
 
             dx = self.target_x - self.x()
             dy = self.target_y - self.y()
 
             distance = (dx**2 + dy**2)**0.5
 
-            if distance < self.speed:
+            # Oblicz czas potrzebny na pokonanie odległości
+            time_to_target = distance / self.speed
+
+            if time_to_target <= 1:  # Jeśli wróg dotarł do celu
                 self.setPos(self.target_x, self.target_y)
                 self.path_index += 1
             else:
-                step_x = self.speed * dx / distance
-                step_y = self.speed * dy / distance
+                # Przesuń wroga proporcjonalnie do prędkości
+                step_x = dx / time_to_target
+                step_y = dy / time_to_target
                 self.setPos(self.x() + step_x, self.y() + step_y)
         else:
             self.controller.decrease_lives()

@@ -2,14 +2,16 @@ from PyQt5.QtCore import QTimer, QLineF
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QGraphicsPixmapItem
 
-from config import GRID_SIZE
+from GameConfig import Config
 
 import assets_rc
 
 class Projectile(QGraphicsPixmapItem):
     def __init__(self, x, y, target, damage, scene):
         super().__init__()
-        self.setPixmap(QPixmap(":/assets/Towers/Combat Towers Projectiles/spr_tower_archer_projectile.png").scaled(GRID_SIZE//4, GRID_SIZE//4))
+        self.config = Config()
+        self.GRID_SIZE = self.config.get_grid_size()
+        self.setPixmap(QPixmap(":/assets/Towers/Combat Towers Projectiles/spr_tower_archer_projectile.png").scaled(self.GRID_SIZE//4, self.GRID_SIZE//4))
         self.setPos(x, y)
 
         self.target = target

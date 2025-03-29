@@ -2,7 +2,8 @@ from PyQt5.QtCore import QTimer, QPointF, QEvent
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsItem
 from GameUnit import GameUnit
-from config import GRID_SIZE, GRID_WIDTH, GRID_HEIGHT
+from GameConfig import Config
+
 from Projectile import Projectile
 
 import assets_rc
@@ -15,8 +16,10 @@ class AnimatedTower(GameUnit):
             frame_count=1,
             frame_duration=0
         )
+        self.config = Config()
+        self.GRID_SIZE = self.config.get_grid_size()
         self.scene = scene
-        self.range = 3 * GRID_SIZE
+        self.range = 3 * self.GRID_SIZE
         self.damage = 10
 
         # self.setFlag(QGraphicsItem.ItemIsMovable, True)
@@ -41,7 +44,7 @@ class AnimatedTower(GameUnit):
             self.create_projectile(nearest_enemy)
 
     def create_projectile(self, target):
-        projectile = Projectile(self.x() + GRID_SIZE / 2, self.y() + GRID_SIZE / 2, target, self.damage, self.scene)
+        projectile = Projectile(self.x() + self.GRID_SIZE / 2, self.y() + self.GRID_SIZE / 2, target, self.damage, self.scene)
         self.scene.addItem(projectile)
 
     def distance_to(self, target):

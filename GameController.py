@@ -2,11 +2,13 @@ from PyQt5.QtCore import Qt, QEvent, QTimer
 
 from Towers import AnimatedTower
 from Enemies import AnimatedEnemy
+from GameConfig import Config
 
-from config import GRID_SIZE
 
 class GameController:
     def __init__(self, scene):
+        self.config = Config()
+        self.GRID_SIZE = self.config.get_grid_size()
         self.scene = scene
         self.lives = 3
         self.updateLifes()
@@ -23,8 +25,8 @@ class GameController:
 
     def handle_mouse_event(self, event):
         pos = event.scenePos()
-        x = int(pos.x() // GRID_SIZE)
-        y = int(pos.y() // GRID_SIZE)
+        x = int(pos.x() // self.GRID_SIZE)
+        y = int(pos.y() // self.GRID_SIZE)
         if (x, y) == (0, 0):
             self.scene.add_tower_palette()
             return False
