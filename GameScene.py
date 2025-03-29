@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QGraphicsScene, QGraphicsTextItem, QGraphicsPixmapItem, QGraphicsRectItem, QGraphicsItem
+from PyQt5.QtWidgets import QGraphicsScene, QGraphicsTextItem, QGraphicsPixmapItem, QGraphicsRectItem, QGraphicsItem, QPushButton
 from PyQt5.QtGui import QPixmap, QFont, QColor
 from PyQt5.QtCore import QPointF, Qt, QEvent
 from Enemies import AnimatedEnemy
@@ -9,9 +9,9 @@ import assets_rc
 from config import GRID_WIDTH, GRID_HEIGHT, GRID_SIZE
 
 class GameScene(QGraphicsScene):
-    def __init__(self, controller, parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
-        self.controller = controller
+        self.controller = None
         self.setSceneRect(0, 0, GRID_WIDTH * GRID_SIZE, GRID_HEIGHT * GRID_SIZE)
         self.path = [
             (0, 5), (1, 5), (2, 5), (3, 5), (3, 4), (3, 3), (4, 3), (5, 3),
@@ -34,6 +34,22 @@ class GameScene(QGraphicsScene):
 
         self.tower_pallete = None
         self.add_tower_palette()
+
+        self.start_button = QPushButton("START LEVEL")
+        self.start_button.setGeometry(GRID_WIDTH * GRID_SIZE - 150, GRID_HEIGHT * GRID_SIZE - 50, 120, 40)
+        self.start_button.clicked.connect(self.start_level_placeholder)  # Tymczasowy placeholder
+        self.start_button.setParent(parent)
+        self.start_button.show()
+
+    def set_controller(self, controller):
+        """Przypisuje kontroler do sceny."""
+        self.controller = controller
+        self.start_button.clicked.disconnect()  # Usuń placeholder
+        self.start_button.clicked.connect(self.controller.start_level)  # Połącz z metodą kontrolera
+
+    def start_level_placeholder(self):
+        """Tymczasowy placeholder dla przycisku przed przypisaniem kontrolera."""
+        print("Controller not set yet!")
 
     def init_path_tiles(self):
         overlay_pixmap = QPixmap(":/assets/Environment/Tile Set/spr_tile_set_ground.png").scaled(GRID_SIZE * 3, GRID_SIZE * 3)
@@ -66,7 +82,6 @@ class GameScene(QGraphicsScene):
                         overlay_item = QGraphicsPixmapItem(self.path_tiles[3])
                     overlay_item.setPos(pos)
                     self.addItem(overlay_item)
-
 
     def add_health_bar(self, enemy):
         health_bar = QGraphicsRectItem(0, -10, GRID_SIZE, 5) 

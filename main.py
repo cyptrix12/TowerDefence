@@ -8,8 +8,9 @@ class Game:
     def __init__(self):
         self.scene = GameScene(None)
         self.controller = GameController(self.scene) 
-        self.scene.controller = self.controller 
+        self.scene.set_controller(self.controller) 
         self.view = GameView(self.scene)
+        self.scene.start_button.setParent(self.view) 
         self.view.show()
         self.view.setMouseTracking(True)
 

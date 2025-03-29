@@ -11,4 +11,4 @@ screen_height = geometry.height()
 GRID_WIDTH = 10
 GRID_HEIGHT = 10
 
-GRID_SIZE = min(screen_width // GRID_WIDTH, screen_height // GRID_HEIGHT)
+GRID_SIZE = min(screen_width // GRID_WIDTH - 1, int(0.8*screen_height)  // GRID_HEIGHT)

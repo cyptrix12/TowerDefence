@@ -29,6 +29,17 @@ class AnimatedEnemy(GameUnit):
         self.move_timer = QTimer()
         self.move_timer.timeout.connect(self.follow_path)
         self.move_timer.start(16)  # (60 FPS)
+    
+    def take_damage(self, damage):
+        self.hp -= damage
+        if self.hp <= 0:
+            self.scene.remove_health_bar(self)
+            self.scene.removeItem(self)
+            print("Enemy destroyed!")
+            self.move_timer.stop()
+            self.controller.on_enemy_destroyed()
+        else:
+            self.scene.update_health_bar(self)
 
     def follow_path(self):
         if self.path_index < len(self.path):
@@ -53,13 +64,4 @@ class AnimatedEnemy(GameUnit):
             self.scene.remove_health_bar(self)  
             self.scene.removeItem(self) 
             self.move_timer.stop()
-
-    def take_damage(self, damage):
-        self.hp -= damage
-        if self.hp <= 0:
-            self.scene.remove_health_bar(self)  
-            self.scene.removeItem(self) 
-            self.move_timer.stop()
-        else:
-            self.scene.update_health_bar(self) 
-
+            self.controller.on_enemy_destroyed()
