@@ -3,7 +3,6 @@ from PyQt5.QtGui import QPixmap, QFont, QColor
 from PyQt5.QtCore import QPointF, Qt, QEvent
 from Enemies import AnimatedEnemy
 from Towers import AnimatedTower
-from Projectile import Projectile
 from GameConfig import Config
 
 import assets_rc

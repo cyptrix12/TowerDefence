@@ -4,15 +4,15 @@ from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsItem, QGraphicsPixmap
 from GameUnit import GameUnit
 from GameConfig import Config
 
-from Projectile import Projectile
+from Projectile import Projectile, LightningProjectile
 
 import assets_rc
 
 class AnimatedTower(GameUnit):
-    def __init__(self, x, y, scene):
+    def __init__(self, x, y, scene, sprite_path=":/assets/Towers/Combat Towers/spr_tower_archer.png"):
         super().__init__(
             x, y,
-            sprite_path=":/assets/Towers/Combat Towers/spr_tower_archer.png",
+            sprite_path=sprite_path,
             frame_count=1,
             frame_duration=0
         )
@@ -103,8 +103,25 @@ class AnimatedTower(GameUnit):
         return (dx**2 + dy**2)**0.5
 
     def upgrade(self):
-        """Zwiększa statystyki wieży i aktualizuje licznik ulepszeń."""
         self.upgrade_count += 1
         self.damage += 5
         self.range += self.GRID_SIZE
         self.upgrade_text.setPlainText(str(self.upgrade_count))
+
+
+class LightningTower(AnimatedTower):
+    def __init__(self, x, y, scene):
+        super().__init__(x, y, scene, sprite_path=":/assets/Towers/Combat Towers/spr_tower_lightning_tower.png")
+        self.attack_speed = 500  
+        self.damage = 50  
+        self.range = 4 * self.GRID_SIZE
+
+    def create_projectile(self, target):
+        projectile = LightningProjectile(
+            self.x() + self.GRID_SIZE / 2,
+            self.y() + self.GRID_SIZE / 2,
+            target,
+            self.damage,
+            self.scene
+        )
+        self.scene.addItem(projectile)

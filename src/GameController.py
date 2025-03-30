@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt, QEvent, QTimer
 from PyQt5.QtWidgets import QGraphicsTextItem
 from PyQt5.QtGui import QFont, QColor
 
-from Towers import AnimatedTower
+from Towers import AnimatedTower, LightningTower
 from Enemies import AnimatedEnemy, FastEnemy
 from GameConfig import Config
 
@@ -68,11 +68,7 @@ class GameController:
         #     self.scene.add_tower_palette()
         #     return False
         if (x, y) not in self.scene.path:
-            if self.money < 20:
-                print("Not enough money!")
-                return False
-            if self.addTower(x, y):
-                self.money -= 20
+            if self.addTower(x, y, tower_type="lightning" if Qt.Key_L in self.pressed_keys else "archer"):
                 self.scene.update_money(self.money)
                 return True
             else:
@@ -82,7 +78,7 @@ class GameController:
             return True
         return False
 
-    def addTower(self, x, y):
+    def addTower(self, x, y, tower_type="archer"):
         if (x, y) in self.scene.tower_positions:
             return False
         if (x, y) in self.scene.path:
@@ -92,7 +88,21 @@ class GameController:
                 return False
         if x < 0 or y < 0 or x >= self.scene.GRID_WIDTH or y >= self.scene.GRID_HEIGHT:
             return False
-        tower = AnimatedTower(x, y, self.scene)
+        if tower_type == "archer":
+            tower = AnimatedTower(x, y, self.scene)
+            if self.money < 20:
+                print("Not enough money!")
+                return False
+            self.money -= 20
+        elif tower_type == "lightning":
+            tower = LightningTower(x, y, self.scene)
+            if self.money < 80:
+                print("Not enough money!")
+                return False
+            self.money -= 80
+        else:
+            print("Invalid tower type!")
+            return False
         self.scene.addItem(tower)
         self.scene.tower_positions.add((x, y))
         return True
@@ -126,8 +136,6 @@ class GameController:
         text_rect = game_over_text.boundingRect()
         game_over_text.setPos((scene_rect.width() - text_rect.width()) / 2,
                               (scene_rect.height() - text_rect.height()) / 2)
-        print(f"self.scene.width() = {scene_rect.width()}")
-        print(f"self.scene.height() = {scene_rect.height()}")
         self.scene.addItem(game_over_text)
         print("Game Over!")
         QTimer.singleShot(50, lambda: setattr(self, 'game_over', True))
