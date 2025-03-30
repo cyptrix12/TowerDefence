@@ -10,7 +10,7 @@ A Tower Defence game written in Python using the PyQt5 framework.
 
 - [x] Map implemented with `QGraphicsScene`
 - [x] Units and terrain as custom `QGraphicsItem` subclasses
-- [ ] Interactive unit control (selection, leveling up, appearance upgrades)
+- [x] Interactive unit control (selection, leveling up, appearance upgrades)
 - [ ] Keyboard-based army control
 - [ ] Optional drag-and-drop unit control with automatic pathfinding
 - [x] Graphics loaded from `.rc` file
