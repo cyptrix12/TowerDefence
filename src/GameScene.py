@@ -33,11 +33,20 @@ class GameScene(QGraphicsScene):
 
         self.overlay_items = []  # Przechowuje elementy overlay z ich typami
         self.init_grid()
+
+        # Lives text
         self.lives_text = QGraphicsTextItem(f"Lives: {0}")
         self.lives_text.setDefaultTextColor(QColor(255, 0, 0))
         self.lives_text.setFont(QFont("Arial", 16))
         self.lives_text.setPos(self.GRID_WIDTH * self.GRID_SIZE - 150, 10)
         self.addItem(self.lives_text)
+
+        # Level text
+        self.level_text = QGraphicsTextItem(f"Level: {0}")
+        self.level_text.setDefaultTextColor(QColor(0, 0, 255))  # Niebieski kolor
+        self.level_text.setFont(QFont("Arial", 16))
+        self.level_text.setPos(self.GRID_WIDTH * self.GRID_SIZE - 150, 40)  # Pod napisem "Lives"
+        self.addItem(self.level_text)
 
         self.health_bars = {}
         self.enemy_class = AnimatedEnemy
@@ -57,7 +66,7 @@ class GameScene(QGraphicsScene):
     def set_controller(self, controller):
         self.controller = controller
         self.start_button.clicked.disconnect()
-        self.start_button.clicked.connect(self.controller.start_level) 
+        self.start_button.clicked.connect(self.controller.start_level)
 
     def start_level_placeholder(self):
         print("Controller not set yet!")
@@ -213,3 +222,7 @@ class GameScene(QGraphicsScene):
             self.removeItem(self.tower_pallete)
             self.add_tower_palette()
             return
+
+    def update_level(self, level):
+        """Aktualizuje tekst poziomu."""
+        self.level_text.setPlainText(f"Level: {level}")

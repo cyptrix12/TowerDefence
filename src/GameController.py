@@ -79,6 +79,7 @@ class GameController:
         self.enemies_to_spawn = self.current_level
         self.spawned_enemies = 0
         self.active_enemies = 0
+        self.scene.update_level(self.current_level)
         self.scene.start_button.hide() 
         self.spawn_wave()
 
