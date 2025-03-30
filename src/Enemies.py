@@ -85,5 +85,17 @@ class FastEnemy(AnimatedEnemy):
         self.hp = 50
         self.max_hp = 50
         self.worth = 20
-        self.speed = 10  # Szybszy ruch
-        self.speed = self.speed * self.GRID_SIZE / 50  # Prędkość w pikselach na milisekundę
+        self.speed = 10  # Faster speed
+        self.speed = self.speed * self.GRID_SIZE / 50  
+
+class TankEnemy(AnimatedEnemy):
+    def __init__(self, x, y, path, scene, controller):
+        super().__init__(
+            x, y, path, scene, controller, frame_count=4, sprite_path = ":/assets/Enemies/spr_big_slime.png"
+        )
+        
+        self.hp = 200
+        self.max_hp = 200
+        self.worth = 30
+        self.speed = 3  # Slower speed
+        self.speed = self.speed * self.GRID_SIZE / 50

@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QGraphicsTextItem
 from PyQt5.QtGui import QFont, QColor
 
 from Towers import AnimatedTower, LightningTower
-from Enemies import AnimatedEnemy, FastEnemy
+from Enemies import AnimatedEnemy, FastEnemy, TankEnemy
 from GameConfig import Config
 
 
@@ -117,6 +117,11 @@ class GameController:
         self.scene.addItem(enemy)
         self.scene.add_health_bar(enemy)
 
+    def addTankEnemy(self):
+        enemy = TankEnemy(self.scene.path[0][0], self.scene.path[0][1], self.scene.path, self.scene, self)
+        self.scene.addItem(enemy)
+        self.scene.add_health_bar(enemy)
+
     def decrease_lives(self):
         self.lives -= 1
         self.scene.lives_text.setPlainText(f"Lives: {self.lives}")
@@ -160,7 +165,10 @@ class GameController:
             self.check_level_end()
 
     def spawn_enemy(self):
-        if (self.enemies_to_spawn - self.spawned_enemies) // 5 > 0:
+        if (self.enemies_to_spawn - self.spawned_enemies) // 10 > 0:
+            self.addTankEnemy()
+            self.spawned_enemies += 10
+        elif (self.enemies_to_spawn - self.spawned_enemies) // 5 > 0:
             self.addFastEnemy()
             self.spawned_enemies += 5
         else:
