@@ -155,7 +155,7 @@ class GameScene(QGraphicsScene):
 
         for overlay in self.overlay_items:
             if overlay["pos"] in adjacent_positions:
-                adjacent_overlays.append(overlay["type"])
+                adjacent_overlays.append({"type": overlay["type"], "item": overlay["item"]})
 
         return adjacent_overlays
 
