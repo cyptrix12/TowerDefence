@@ -19,17 +19,13 @@ class Game:
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
-    # Wyświetl okno konfiguracji
     config_window = ConfigWindow()
     if config_window.exec_() == QDialog.Accepted:
-        grid_width, grid_height = config_window.get_config()
-        print(f"Wybrane wartości: Grid Width = {grid_width}, Grid Height = {grid_height}")
+        grid_width, grid_height, endless_runner = config_window.get_config()
+        print(f"Wybrane wartości: Grid Width = {grid_width}, Grid Height = {grid_height}, Endless Runner = {endless_runner}")
 
         config = Config(grid_width, grid_height)
 
-        print("zainicjowane")
-
-
-        # Uruchom grę z wprowadzonymi wartościami
         game = Game()
+        game.controller.endless_runner = endless_runner
         sys.exit(app.exec_())

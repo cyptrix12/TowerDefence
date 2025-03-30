@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QCheckBox
 
 class ConfigWindow(QDialog):
     def __init__(self):
@@ -23,6 +23,10 @@ class ConfigWindow(QDialog):
         layout.addWidget(self.grid_height_label)
         layout.addWidget(self.grid_height_input)
 
+        # Endless conquest Checkbox
+        self.endless_conquest_checkbox = QCheckBox("Endless conquest")
+        layout.addWidget(self.endless_conquest_checkbox)
+
         # Start Button
         self.start_button = QPushButton("Start")
         self.start_button.clicked.connect(self.accept)  # Zatwierdź i zamknij okno
@@ -31,7 +35,8 @@ class ConfigWindow(QDialog):
         self.setLayout(layout)
 
     def get_config(self):
-        """Zwraca wprowadzone wartości jako int."""
+        """Zwraca wprowadzone wartości jako int oraz tryb Endless conquest."""
         grid_width = int(self.grid_width_input.text())
         grid_height = int(self.grid_height_input.text())
-        return grid_width, grid_height
+        endless_conquest = self.endless_conquest_checkbox.isChecked()
+        return grid_width, grid_height, endless_conquest

@@ -16,6 +16,7 @@ class GameController:
         self.enemies_to_spawn = 0
         self.spawned_enemies = 0
         self.active_enemies = 0
+        self.endless_runner = False  
 
     def EventFilter(self, obj, event):
         if event.type() == QEvent.GraphicsSceneMousePress:
@@ -73,13 +74,13 @@ class GameController:
         self.enemies_to_spawn = self.current_level
         self.spawned_enemies = 0
         self.active_enemies = 0
-        self.scene.start_button.hide()
+        self.scene.start_button.hide() 
         self.spawn_wave()
 
     def spawn_wave(self):
         if self.spawned_enemies < self.enemies_to_spawn:
             self.spawn_enemy()
-            QTimer.singleShot(500, self.spawn_wave) 
+            QTimer.singleShot(500, self.spawn_wave)  
         else:
             self.check_level_end()
 
@@ -88,7 +89,7 @@ class GameController:
         self.scene.addItem(enemy)
         self.scene.add_health_bar(enemy)
         self.spawned_enemies += 1
-        self.active_enemies += 1 
+        self.active_enemies += 1
 
     def on_enemy_destroyed(self):
         self.active_enemies -= 1
@@ -96,4 +97,7 @@ class GameController:
 
     def check_level_end(self):
         if self.active_enemies == 0 and self.spawned_enemies == self.enemies_to_spawn:
-            self.scene.start_button.show() 
+            if self.endless_runner:
+                self.start_level()
+            else:
+                self.scene.start_button.show()
