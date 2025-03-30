@@ -17,14 +17,28 @@ class GameController:
         self.spawned_enemies = 0
         self.active_enemies = 0
         self.endless_runner = False  
+        self.w_pressed = False
+        self.money = 100 
+        self.scene.update_money(self.money)
 
     def EventFilter(self, obj, event):
+        if event.type() == QEvent.KeyPress:
+            if event.key() == Qt.Key_W:
+                self.w_pressed = True
+            if event.key() == Qt.Key_Space:
+                self.scene.start_button.click()
+        elif event.type() == QEvent.KeyRelease:
+            if event.key() == Qt.Key_W:
+                self.w_pressed = False
         if event.type() == QEvent.GraphicsSceneMousePress:
             if event.button() == Qt.LeftButton:
                 return self.handle_mouse_event(event)
+            
         return False
 
     def handle_mouse_event(self, event):
+        if not self.w_pressed:
+            return False
         pos = event.scenePos()
         x = int(pos.x() // self.GRID_SIZE)
         y = int(pos.y() // self.GRID_SIZE)
@@ -32,6 +46,11 @@ class GameController:
             self.scene.add_tower_palette()
             return False
         if (x, y) not in self.scene.path:
+            if self.money < 20:
+                print("Not enough money!")
+                return False
+            self.money -= 20
+            self.scene.update_money(self.money)
             self.addTower(x, y)
             return False
         else:
@@ -101,6 +120,8 @@ class GameController:
 
     def on_enemy_destroyed(self):
         self.active_enemies -= 1
+        self.money += 10
+        self.scene.update_money(self.money)
         self.check_level_end()
 
     def check_level_end(self):

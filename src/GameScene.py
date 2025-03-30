@@ -24,14 +24,13 @@ class GameScene(QGraphicsScene):
         self.path_tiles = []
         self.init_path_tiles()
 
-        # Lista źródeł assetów z przypisanymi typami
         self.overlay_assets = [
             (":/assets/Environment/Decoration/spr_mushroom_01.png", "mushroom"),
             (":/assets/Environment/Decoration/spr_rock_01.png", "rock"),
             (":/assets/Environment/Decoration/spr_tree_01_normal.png", "tree")
         ]
 
-        self.overlay_items = []  # Przechowuje elementy overlay z ich typami
+        self.overlay_items = []  
         self.init_grid()
 
         # Lives text
@@ -43,10 +42,17 @@ class GameScene(QGraphicsScene):
 
         # Level text
         self.level_text = QGraphicsTextItem(f"Level: {0}")
-        self.level_text.setDefaultTextColor(QColor(0, 0, 255))  # Niebieski kolor
+        self.level_text.setDefaultTextColor(QColor(0, 0, 255))  # Blue
         self.level_text.setFont(QFont("Arial", 16))
-        self.level_text.setPos(self.GRID_WIDTH * self.GRID_SIZE - 150, 40)  # Pod napisem "Lives"
+        self.level_text.setPos(self.GRID_WIDTH * self.GRID_SIZE - 150, 40)
         self.addItem(self.level_text)
+
+        # Money text
+        self.money_text = QGraphicsTextItem(f"Money: {100}")
+        self.money_text.setDefaultTextColor(QColor(255, 215, 0))  # Gold
+        self.money_text.setFont(QFont("Arial", 16))
+        self.money_text.setPos(self.GRID_WIDTH * self.GRID_SIZE - 150, 70) 
+        self.addItem(self.money_text)
 
         self.health_bars = {}
         self.enemy_class = AnimatedEnemy
@@ -119,14 +125,13 @@ class GameScene(QGraphicsScene):
                 bg_item.setPos(pos)
                 self.addItem(bg_item)
 
-                if (x, y) not in self.path and random.random() < 0.1:  # 10% szansy
+                if (x, y) not in self.path and random.random() < 0.1:  # 10% chance
                     overlay_source, overlay_type = random.choice(self.overlay_assets)
                     overlay_pixmap = QPixmap(overlay_source).scaled(self.GRID_SIZE // 3, self.GRID_SIZE // 3)
                     overlay_item = QGraphicsPixmapItem(overlay_pixmap)
                     overlay_item.setPos(pos)
                     self.addItem(overlay_item)
 
-                    # Dodaj element overlay do listy
                     self.overlay_items.append({"item": overlay_item, "type": overlay_type, "pos": (x, y)})
 
         previous_pos = None
@@ -155,10 +160,9 @@ class GameScene(QGraphicsScene):
             previous_pos = path_pos
 
     def get_adjacent_overlays(self, x, y):
-        """Sprawdza, jakie overlay są w odległości 1 kratki od podanej pozycji."""
         adjacent_positions = [
-            (x - 1, y), (x + 1, y),  # Lewo, Prawo
-            (x, y - 1), (x, y + 1)   # Góra, Dół
+            (x - 1, y), (x + 1, y),  # Left, Right
+            (x, y - 1), (x, y + 1)   # Up, Down
         ]
         adjacent_overlays = []
 
@@ -200,12 +204,13 @@ class GameScene(QGraphicsScene):
         return super().eventFilter(source, event)
 
     def add_tower_palette(self):
-        background = QGraphicsRectItem(0, 0, self.GRID_SIZE, self.GRID_SIZE)
+        return
+        background = QGraphicsRectItem(0, 2 * self.GRID_SIZE, self.GRID_SIZE, self.GRID_SIZE)
         background.setBrush(QColor(255, 255, 255))  # White
 
         self.addItem(background)
 
-        tower_palette = AnimatedTower(0, 0, self)
+        tower_palette = AnimatedTower(0, 2, self)
         tower_palette.setFlag(QGraphicsItem.ItemIsMovable, True)
         tower_palette.setFlag(QGraphicsItem.ItemIsSelectable, True)
 
@@ -213,16 +218,20 @@ class GameScene(QGraphicsScene):
         self.addItem(tower_palette)
 
     def mouseReleaseEvent(self, event):
-        if self.tower_pallete.isUnderMouse():
-            pos = event.scenePos()
-            x = int(pos.x() // self.GRID_SIZE)
-            y = int(pos.y() // self.GRID_SIZE)
-            if (x, y) not in self.path:
-                self.controller.addTower(x, y)
-            self.removeItem(self.tower_pallete)
-            self.add_tower_palette()
-            return
+        # if self.tower_pallete.isUnderMouse():
+        #     pos = event.scenePos()
+        #     x = int(pos.x() // self.GRID_SIZE)
+        #     y = int(pos.y() // self.GRID_SIZE)
+        #     if (x, y) not in self.path:
+        #         self.controller.addTower(x, y)
+        #     self.removeItem(self.tower_pallete)
+        #     self.add_tower_palette()
+        return
 
     def update_level(self, level):
         """Aktualizuje tekst poziomu."""
         self.level_text.setPlainText(f"Level: {level}")
+
+    def update_money(self, money):
+        """Uaktualnia tekst wyświetlający money."""
+        self.money_text.setPlainText(f"Money: {money}")
