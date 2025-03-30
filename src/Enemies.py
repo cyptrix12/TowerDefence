@@ -19,6 +19,9 @@ class AnimatedEnemy(GameUnit):
         self.hp = 100
         self.max_hp = 100 
 
+
+        self.worth = 10 
+
         self.path = path
         self.path_index = 0
         self.speed = 5
@@ -40,7 +43,7 @@ class AnimatedEnemy(GameUnit):
             self.scene.removeItem(self)
             print("Enemy destroyed!")
             self.move_timer.stop()
-            self.controller.on_enemy_destroyed()
+            self.controller.on_enemy_destroyed(self.worth)
         else:
             self.scene.update_health_bar(self)
 
@@ -71,7 +74,7 @@ class AnimatedEnemy(GameUnit):
             self.scene.remove_health_bar(self)  
             self.scene.removeItem(self) 
             self.move_timer.stop()
-            self.controller.on_enemy_destroyed()
+            self.controller.on_enemy_destroyed(self.worth)
 
 class FastEnemy(AnimatedEnemy):
     def __init__(self, x, y, path, scene, controller):
@@ -81,5 +84,6 @@ class FastEnemy(AnimatedEnemy):
         
         self.hp = 50
         self.max_hp = 50
+        self.worth = 20
         self.speed = 10  # Szybszy ruch
         self.speed = self.speed * self.GRID_SIZE / 50  # Prędkość w pikselach na milisekundę

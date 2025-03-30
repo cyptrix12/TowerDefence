@@ -1,4 +1,6 @@
 from PyQt5.QtCore import Qt, QEvent, QTimer
+from PyQt5.QtWidgets import QGraphicsTextItem
+from PyQt5.QtGui import QFont, QColor
 
 from Towers import AnimatedTower
 from Enemies import AnimatedEnemy, FastEnemy
@@ -20,8 +22,11 @@ class GameController:
         self.w_pressed = False
         self.money = 100 
         self.scene.update_money(self.money)
+        self.game_over = False
 
     def EventFilter(self, obj, event):
+        if self.game_over:
+            return True
         if event.type() == QEvent.KeyPress:
             if event.key() == Qt.Key_W:
                 self.w_pressed = True
@@ -33,7 +38,6 @@ class GameController:
         if event.type() == QEvent.GraphicsSceneMousePress:
             if event.button() == Qt.LeftButton:
                 return self.handle_mouse_event(event)
-            
         return False
 
     def handle_mouse_event(self, event):
@@ -85,15 +89,32 @@ class GameController:
     def decrease_lives(self):
         self.lives -= 1
         self.scene.lives_text.setPlainText(f"Lives: {self.lives}")
-        if self.lives <= 0:
-            print("Game Over!")
+        if self.lives <= 0 and not self.game_over:
+            self.show_game_over()
 
     def updateLifes(self):
         self.scene.lives_text.setPlainText(f"Lives: {self.lives}")
-        if self.lives <= 0:
-            print("Game Over!")
+        if self.lives <= 0 and not self.game_over:
+            self.show_game_over()
+
+    def show_game_over(self):
+        game_over_text = QGraphicsTextItem("GAME OVER!")
+        game_over_text.setDefaultTextColor(QColor(255, 0, 0))
+        game_over_text.setFont(QFont("Arial", 48, QFont.Bold))
+        scene_rect = self.scene.sceneRect()
+        text_rect = game_over_text.boundingRect()
+        game_over_text.setPos((scene_rect.width() - text_rect.width()) / 2,
+                              (scene_rect.height() - text_rect.height()) / 2)
+        print(f"self.scene.width() = {scene_rect.width()}")
+        print(f"self.scene.height() = {scene_rect.height()}")
+        self.scene.addItem(game_over_text)
+        print("Game Over!")
+        QTimer.singleShot(50, lambda: setattr(self, 'game_over', True))
 
     def start_level(self):
+        if self.active_enemies > 0:
+            print("Enemies are still alive!")
+            return
         self.current_level += 1
         self.enemies_to_spawn = self.current_level
         self.spawned_enemies = 0
@@ -118,9 +139,9 @@ class GameController:
             self.spawned_enemies += 1
         self.active_enemies += 1
 
-    def on_enemy_destroyed(self):
+    def on_enemy_destroyed(self, worth):
         self.active_enemies -= 1
-        self.money += 10
+        self.money += worth
         self.scene.update_money(self.money)
         self.check_level_end()
 
