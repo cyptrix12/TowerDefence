@@ -12,7 +12,7 @@ class AnimatedTower(GameUnit):
     def __init__(self, x, y, scene):
         super().__init__(
             x, y,
-            sprite_path=":/assets/Towers/Combat Towers/spr_tower_lightning_tower.png",
+            sprite_path=":/assets/Towers/Combat Towers/spr_tower_archer.png",
             frame_count=1,
             frame_duration=0
         )
