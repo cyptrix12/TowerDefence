@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt, QEvent, QTimer
 
 from Towers import AnimatedTower
-from Enemies import AnimatedEnemy
+from Enemies import AnimatedEnemy, FastEnemy
 from GameConfig import Config
 
 
@@ -58,6 +58,11 @@ class GameController:
         self.scene.addItem(enemy)
         self.scene.add_health_bar(enemy)
 
+    def addFastEnemy(self):
+        enemy = FastEnemy(self.scene.path[0][0], self.scene.path[0][1], self.scene.path, self.scene, self)
+        self.scene.addItem(enemy)
+        self.scene.add_health_bar(enemy)
+
     def decrease_lives(self):
         self.lives -= 1
         self.scene.lives_text.setPlainText(f"Lives: {self.lives}")
@@ -85,10 +90,12 @@ class GameController:
             self.check_level_end()
 
     def spawn_enemy(self):
-        enemy = self.scene.enemy_class(self.scene.path[0][0], self.scene.path[0][1], self.scene.path, self.scene, self)
-        self.scene.addItem(enemy)
-        self.scene.add_health_bar(enemy)
-        self.spawned_enemies += 1
+        if (self.enemies_to_spawn - self.spawned_enemies) // 5 > 0:
+            self.addFastEnemy()
+            self.spawned_enemies += 5
+        else:
+            self.addEnemy()
+            self.spawned_enemies += 1
         self.active_enemies += 1
 
     def on_enemy_destroyed(self):

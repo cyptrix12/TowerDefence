@@ -6,16 +6,15 @@ from GameConfig import Config
 import assets_rc
 
 class AnimatedEnemy(GameUnit):
-    def __init__(self, x, y, path, scene, controller):
+    def __init__(self, x, y, path, scene, controller, frame_count=4, sprite_path=":/assets/Enemies/spr_bat.png"):   
         super().__init__(
             x, y,
-            sprite_path=":/assets/Enemies/spr_bat.png",
-            frame_count=4,
+            sprite_path=sprite_path,
+            frame_count=frame_count,
             frame_duration=200
         )
         self.config = Config()
         self.GRID_SIZE = self.config.get_grid_size()
-
 
         self.hp = 100
         self.max_hp = 100 
@@ -26,7 +25,6 @@ class AnimatedEnemy(GameUnit):
         self.speed = self.speed * self.GRID_SIZE / 50  # Speed in pixels per millisecond
         self.scene = scene 
         self.controller = controller
-
 
         self.target_x = x * self.GRID_SIZE
         self.target_y = y * self.GRID_SIZE
@@ -74,3 +72,14 @@ class AnimatedEnemy(GameUnit):
             self.scene.removeItem(self) 
             self.move_timer.stop()
             self.controller.on_enemy_destroyed()
+
+class FastEnemy(AnimatedEnemy):
+    def __init__(self, x, y, path, scene, controller):
+        super().__init__(
+            x, y, path, scene, controller, frame_count=8, sprite_path = ":/assets/Enemies/spr_ghost.png"
+        )
+        
+        self.hp = 50
+        self.max_hp = 50
+        self.speed = 10  # Szybszy ruch
+        self.speed = self.speed * self.GRID_SIZE / 50  # Prędkość w pikselach na milisekundę
