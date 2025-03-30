@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QTimer, QPointF, QEvent
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsItem, QGraphicsPixmapItem
+from PyQt5.QtGui import QColor, QFont
+from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsItem, QGraphicsPixmapItem, QGraphicsTextItem
 from GameUnit import GameUnit
 from GameConfig import Config
 
@@ -22,6 +22,13 @@ class AnimatedTower(GameUnit):
         self.range = 3 * self.GRID_SIZE
         self.damage = 20
         self.attack_speed = 1000
+        self.upgrade_count = 0  
+
+        self.upgrade_text = QGraphicsTextItem(str(self.upgrade_count), self)
+        self.upgrade_text.setDefaultTextColor(QColor(255, 255, 255))  # White
+        self.upgrade_text.setFont(QFont("Arial", 16, QFont.Bold))
+        self.upgrade_text.setZValue(10)  
+        self.upgrade_text.setPos(self.GRID_SIZE / 4, self.GRID_SIZE / 4)  
 
         self.buff_icons = []
 
@@ -94,3 +101,10 @@ class AnimatedTower(GameUnit):
         dx = (target.x() - self.x())
         dy = (target.y() - self.y())
         return (dx**2 + dy**2)**0.5
+
+    def upgrade(self):
+        """Zwiększa statystyki wieży i aktualizuje licznik ulepszeń."""
+        self.upgrade_count += 1
+        self.damage += 5
+        self.range += self.GRID_SIZE
+        self.upgrade_text.setPlainText(str(self.upgrade_count))

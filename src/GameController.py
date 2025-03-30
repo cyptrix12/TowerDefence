@@ -44,11 +44,29 @@ class GameController:
         if not self.w_pressed:
             return False
         pos = event.scenePos()
+        clicked_items = self.scene.items(pos) 
+
+        for item in clicked_items:
+            if isinstance(item, AnimatedTower):
+                if self.money < 10:
+                    print("Not enough money to upgrade the tower!")
+                    return False
+
+                self.money -= 10
+                self.scene.update_money(self.money)
+
+                item.upgrade()
+                print(f"Tower upgraded! New damage: {item.damage}, new range: {item.range}")
+                return True
+
         x = int(pos.x() // self.GRID_SIZE)
         y = int(pos.y() // self.GRID_SIZE)
-        if (x, y) == (0, 0):
-            self.scene.add_tower_palette()
+        if (x ,y) in self.scene.tower_positions:
             return False
+            
+        # if (x, y) == (0, 0):
+        #     self.scene.add_tower_palette()
+        #     return False
         if (x, y) not in self.scene.path:
             if self.money < 20:
                 print("Not enough money!")
