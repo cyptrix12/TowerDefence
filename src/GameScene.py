@@ -228,9 +228,7 @@ class GameScene(QGraphicsScene):
         return
 
     def update_level(self, level):
-        """Aktualizuje tekst poziomu."""
         self.level_text.setPlainText(f"Level: {level}")
 
     def update_money(self, money):
-        """Uaktualnia tekst wyświetlający money."""
         self.money_text.setPlainText(f"Money: {money}")

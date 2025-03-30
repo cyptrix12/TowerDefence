@@ -1,7 +1,9 @@
 from PyQt5.QtGui import QGuiApplication
 
+# Singleton
+
 class Config:
-    _instance = None  # Statyczna zmienna przechowująca jedyną instancję klasy
+    _instance = None  
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
@@ -9,7 +11,7 @@ class Config:
         return cls._instance
 
     def __init__(self, width=50, height=50):
-        if not hasattr(self, "initialized"):  # Zapobiega wielokrotnej inicjalizacji
+        if not hasattr(self, "initialized"):  
             screen = QGuiApplication.primaryScreen()
             geometry = screen.geometry()
             self.screen_width = geometry.width()
@@ -18,7 +20,7 @@ class Config:
             self.grid_width = width
             self.grid_height = height
             self.grid_size = self.calculate_grid_size()
-            self.initialized = True  # Flaga, aby uniknąć ponownej inicjalizacji
+            self.initialized = True  
 
     def calculate_grid_size(self):
         return min(

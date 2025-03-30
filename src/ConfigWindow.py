@@ -12,14 +12,14 @@ class ConfigWindow(QDialog):
         # Grid Width
         self.grid_width_label = QLabel("Grid Width:")
         self.grid_width_input = QLineEdit()
-        self.grid_width_input.setText("10")  # Domyślna wartość
+        self.grid_width_input.setText("10") 
         layout.addWidget(self.grid_width_label)
         layout.addWidget(self.grid_width_input)
 
         # Grid Height
         self.grid_height_label = QLabel("Grid Height:")
         self.grid_height_input = QLineEdit()
-        self.grid_height_input.setText("10")  # Domyślna wartość
+        self.grid_height_input.setText("10") 
         layout.addWidget(self.grid_height_label)
         layout.addWidget(self.grid_height_input)
 
@@ -29,13 +29,12 @@ class ConfigWindow(QDialog):
 
         # Start Button
         self.start_button = QPushButton("Start")
-        self.start_button.clicked.connect(self.accept)  # Zatwierdź i zamknij okno
+        self.start_button.clicked.connect(self.accept)
         layout.addWidget(self.start_button)
 
         self.setLayout(layout)
 
     def get_config(self):
-        """Zwraca wprowadzone wartości jako int oraz tryb Endless conquest."""
         grid_width = int(self.grid_width_input.text())
         grid_height = int(self.grid_height_input.text())
         endless_conquest = self.endless_conquest_checkbox.isChecked()

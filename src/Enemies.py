@@ -58,14 +58,12 @@ class AnimatedEnemy(GameUnit):
 
             distance = (dx**2 + dy**2)**0.5
 
-            # Oblicz czas potrzebny na pokonanie odległości
             time_to_target = distance / self.speed
 
-            if time_to_target <= 1:  # Jeśli wróg dotarł do celu
+            if time_to_target <= 1:  
                 self.setPos(self.target_x, self.target_y)
                 self.path_index += 1
             else:
-                # Przesuń wroga proporcjonalnie do prędkości
                 step_x = dx / time_to_target
                 step_y = dy / time_to_target
                 self.setPos(self.x() + step_x, self.y() + step_y)
