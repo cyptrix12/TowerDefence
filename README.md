@@ -8,21 +8,21 @@ A Tower Defence game written in Python using the PyQt5 framework.
 
 ### Features:
 
-- Map implemented with `QGraphicsScene`
-- Units and terrain as custom `QGraphicsItem` subclasses
-- Interactive unit control (selection, leveling up, appearance upgrades)
-- Keyboard-based army control
-- Optional drag-and-drop unit control with automatic pathfinding
-- Graphics loaded from `.rc` file
-- 3 types of enemies with different behavior (random, strategist, aggressor)
-- Random map generation (configurable size, e.g. 50x50)
-- Terrain-based combat modifiers (castles, forests, mountains)
-- Unit and combat animations
-- 3D FPP/TPP gameplay mode (optional)
-- Endless Conquest mode – survive infinite enemy waves
-- Story mode with missions and narration
-- Gesture-based control via camera (hand movement recognition)
-- Logging system with rotating logs (console + QTextEdit)
+- [x] Map implemented with `QGraphicsScene`
+- [x] Units and terrain as custom `QGraphicsItem` subclasses
+- [x] Interactive unit control (selection, leveling up, appearance upgrades)
+- [x] Keyboard-based army control
+- [x] Optional drag-and-drop unit control with automatic pathfinding
+- [x] Graphics loaded from `.rc` file
+- [x] 3 types of enemies with different behavior (random, strategist, aggressor)
+- [x] Random map generation (configurable size, e.g. 50x50)
+- [x] Terrain-based combat modifiers (castles, forests, mountains)
+- [x] Unit and combat animations
+- [x] 3D FPP/TPP gameplay mode (optional)
+- [x] Endless Conquest mode – survive infinite enemy waves
+- [x] Story mode with missions and narration
+- [x] Gesture-based control via camera (hand movement recognition)
+- [x] Logging system with rotating logs (console + QTextEdit)
 
 ## ⚙️ Installation
 
