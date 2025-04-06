@@ -22,7 +22,8 @@ class AnimatedTower(GameUnit):
         self.range = 3 * self.GRID_SIZE
         self.damage = 20
         self.attack_speed = 1000
-        self.upgrade_count = 0  
+        self.upgrade_count = 0 
+        self.type_str = "archer"
 
         self.upgrade_text = QGraphicsTextItem(str(self.upgrade_count), self)
         self.upgrade_text.setDefaultTextColor(QColor(255, 255, 255))  # White
@@ -115,6 +116,7 @@ class LightningTower(AnimatedTower):
         self.attack_speed = 500  
         self.damage = 50  
         self.range = 4 * self.GRID_SIZE
+        self.type_str = "lightning"
 
     def create_projectile(self, target):
         projectile = LightningProjectile(

@@ -5,6 +5,7 @@ from PyQt5.QtGui import QFont, QColor
 from Towers import AnimatedTower, LightningTower
 from Enemies import AnimatedEnemy, FastEnemy, TankEnemy
 from GameConfig import Config
+from GameHistory import GameHistory
 
 
 class GameController:
@@ -24,6 +25,7 @@ class GameController:
         self.money = 100 
         self.scene.update_money(self.money)
         self.game_over = False
+        self.game_history = GameHistory()
 
     def EventFilter(self, obj, event):
         if self.game_over:
@@ -188,3 +190,29 @@ class GameController:
                 self.start_level()
             else:
                 self.scene.start_button.show()
+            towers = [item for item in self.scene.items() if isinstance(item, AnimatedTower)]
+            tower_data = [
+            {
+                "position": {"x": tower.x() // self.GRID_SIZE, "y":tower.y() // self.GRID_SIZE},
+                "type": tower.type_str,
+                "level": tower.upgrade_count
+            }
+            for tower in towers
+            ]
+
+            overlay_data = [
+                {"type": overlay["type"], "position": {"x": overlay["pos"][0], "y": overlay["pos"][1]}}
+                for overlay in self.scene.overlay_items
+            ]
+
+            self.game_history.update_state(
+                grid=self.scene.path,
+                overlay_items=overlay_data,
+                towers=tower_data,
+                level=self.current_level,
+                money=self.money,
+                lives=self.lives,
+                config=self.config.get_config()
+            )
+            print("Towers:", tower_data)
+            
