@@ -1,6 +1,6 @@
 import json
 import xml.etree.ElementTree as ET
-# from pymongo import MongoClient  # Do obsługi bazy danych MongoDB
+from pymongo import MongoClient
 
 class GameHistory:
     _instance = None  # Singleton
@@ -11,7 +11,7 @@ class GameHistory:
         return cls._instance
 
     def __init__(self):
-        if not hasattr(self, "state"):  # Zapobiega ponownemu nadpisaniu przy kolejnych inicjalizacjach
+        if not hasattr(self, "state"):
             self.state = {
                 "grid": [],
                 "overlay_items": [],
@@ -36,6 +36,7 @@ class GameHistory:
 
         self.save_to_json("game_state1.json")
         self.save_to_xml("game_state1.xml")
+        self.save_to_mongodb("game_db", "game_history")
 
     def save_to_json(self, filepath):
         """Zapisuje stan gry do pliku JSON."""
@@ -75,10 +76,14 @@ class GameHistory:
 
     def save_to_mongodb(self, db_name, collection_name):
         """Zapisuje stan gry do bazy MongoDB."""
-        client = MongoClient("mongodb://localhost:27017/")
-        db = client[db_name]
-        collection = db[collection_name]
-        collection.insert_one(self.state)
+        try:
+            client = MongoClient("mongodb://localhost:27017/")
+            db = client[db_name]
+            collection = db[collection_name]
+            collection.insert_one(self.state)
+            print("Stan gry zapisany w MongoDB.")
+        except Exception as e:
+            print(f"Błąd podczas zapisu do MongoDB: {e}")
 
     def load_from_json(self, filepath):
         """Ładuje stan gry z pliku JSON."""
@@ -109,12 +114,40 @@ class GameHistory:
                             else:
                                 tower_data[sub.tag] = sub.text
                         self.state[child.tag].append(tower_data)
+                elif child.tag == "overlay_items":  # Odczyt elementów overlay
+                    self.state[child.tag] = []
+                    for item in child:
+                        overlay_data = {}
+                        for sub in item:
+                            if sub.tag == "position":
+                                overlay_data[sub.tag] = {
+                                    "x": int(sub.get("x")),
+                                    "y": int(sub.get("y"))
+                                }
+                            else:
+                                overlay_data[sub.tag] = sub.text
+                        self.state[child.tag].append(overlay_data)
+                elif child.tag == "config":  # Odczyt konfiguracji jako słownika
+                    self.state[child.tag] = {sub.tag: self._convert_value(sub.text) for sub in child}
                 else:  # Odczyt innych list
                     self.state[child.tag] = [
                         {sub.tag: sub.text for sub in item} for item in child
                     ]
             else:
-                self.state[child.tag] = child.text
+                self.state[child.tag] = self._convert_value(child.text)
+
+    def _convert_value(self, value):
+        """Konwertuje wartość tekstową na odpowiedni typ (int, float, bool lub str)."""
+        if value is None:
+            return None
+        if value.lower() in ("true", "false"):
+            return value.lower() == "true"
+        try:
+            if "." in value:
+                return float(value)
+            return int(value)
+        except ValueError:
+            return value
 
     def load_from_mongodb(self, db_name, collection_name):
         """Ładuje stan gry z bazy MongoDB."""

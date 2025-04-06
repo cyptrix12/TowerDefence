@@ -30,7 +30,7 @@ class GameScene(QGraphicsScene):
         ]
 
         self.overlay_items = []  
-        self.init_grid()
+        self.init_grid(True)
 
         # Lives text
         self.lives_text = QGraphicsTextItem(f"Lives: {0}")
@@ -67,6 +67,29 @@ class GameScene(QGraphicsScene):
         self.start_button.clicked.connect(self.start_level_placeholder)
         self.start_button.setParent(parent)
         self.start_button.show()
+
+    def second_init(self):
+        # Lives text
+        self.lives_text = QGraphicsTextItem(f"Lives: {0}")
+        self.lives_text.setDefaultTextColor(QColor(255, 0, 0))
+        self.lives_text.setFont(QFont("Arial", 16))
+        self.lives_text.setPos(self.GRID_WIDTH * self.GRID_SIZE - 150, 10)
+        self.addItem(self.lives_text)
+
+        # Level text
+        self.level_text = QGraphicsTextItem(f"Level: {0}")
+        self.level_text.setDefaultTextColor(QColor(0, 0, 255))  # Blue
+        self.level_text.setFont(QFont("Arial", 16))
+        self.level_text.setPos(self.GRID_WIDTH * self.GRID_SIZE - 150, 40)
+        self.addItem(self.level_text)
+
+        # Money text
+        self.money_text = QGraphicsTextItem(f"Money: {100}")
+        self.money_text.setDefaultTextColor(QColor(255, 215, 0))  # Gold
+        self.money_text.setFont(QFont("Arial", 16))
+        self.money_text.setPos(self.GRID_WIDTH * self.GRID_SIZE - 150, 70) 
+        self.addItem(self.money_text)
+
 
     def set_controller(self, controller):
         self.controller = controller
@@ -114,7 +137,9 @@ class GameScene(QGraphicsScene):
             for y in range(3) for x in range(3)
         ]
 
-    def init_grid(self):
+    def init_grid(self, is_first_time):
+        self.overlay_items = []
+
         for x in range(self.GRID_WIDTH):
             for y in range(self.GRID_HEIGHT):
                 pos = QPointF(x * self.GRID_SIZE, y * self.GRID_SIZE)
@@ -124,7 +149,7 @@ class GameScene(QGraphicsScene):
                 bg_item.setPos(pos)
                 self.addItem(bg_item)
 
-                if (x, y) not in self.path and random.random() < 0.1:  # 10% chance
+                if (x, y) not in self.path and random.random() < 0.1 and is_first_time:  # 10% chance
                     overlay_source, overlay_type = random.choice(self.overlay_assets)
                     overlay_pixmap = QPixmap(overlay_source).scaled(self.GRID_SIZE // 3, self.GRID_SIZE // 3)
                     overlay_item = QGraphicsPixmapItem(overlay_pixmap)
@@ -232,3 +257,6 @@ class GameScene(QGraphicsScene):
 
     def update_money(self, money):
         self.money_text.setPlainText(f"Money: {money}")
+
+    def get_path(self):
+        return self.path

@@ -1,11 +1,12 @@
 from PyQt5.QtCore import Qt, QEvent, QTimer
-from PyQt5.QtWidgets import QGraphicsTextItem
-from PyQt5.QtGui import QFont, QColor
+from PyQt5.QtWidgets import QGraphicsTextItem, QGraphicsPixmapItem
+from PyQt5.QtGui import QFont, QColor, QPixmap
 
 from Towers import AnimatedTower, LightningTower
 from Enemies import AnimatedEnemy, FastEnemy, TankEnemy
 from GameConfig import Config
 from GameHistory import GameHistory
+
 
 
 class GameController:
@@ -42,8 +43,6 @@ class GameController:
         return False
 
     def handle_mouse_event(self, event):
-        # if Qt.Key_W in self.pressed_keys:
-        #     return False
         pos = event.scenePos()
         clicked_items = self.scene.items(pos) 
 
@@ -66,10 +65,7 @@ class GameController:
         if (x ,y) in self.scene.tower_positions:
             return False
             
-        # if (x, y) == (0, 0):
-        #     self.scene.add_tower_palette()
-        #     return False
-        if (x, y) not in self.scene.path:
+        if (x, y) not in self.scene.get_path():
             if self.addTower(x, y, tower_type="lightning" if Qt.Key_L in self.pressed_keys else "archer"):
                 self.scene.update_money(self.money)
                 return True
@@ -214,5 +210,68 @@ class GameController:
                 lives=self.lives,
                 config=self.config.get_config()
             )
-            print("Towers:", tower_data)
+
+    def load_game(self):
+        """Wczytuje zapis gry z pliku JSON i aktualizuje stan gry."""
+        game_history = GameHistory()
+        try:
+            state = game_history.state
+
+            # Aktualizuj stan gry
+            self.lives = int(state["lives"])
+            self.money = int(state["money"])
+            self.current_level = int(state["level"])
+            self.scene.path = [tuple(pos) for pos in state["grid"]]
+
+
+            # Aktualizuj teksty w scenie
+            # Odśwież siatkę
+            self.scene.init_path_tiles()
+            self.scene.init_grid(False)
+
             
+
+
+            # Dodaj elementy overlay
+            for overlay_data in state["overlay_items"]:
+                position = overlay_data["position"]
+                overlay_type = overlay_data["type"]
+                x, y = int(position["x"]), int(position["y"])
+                if overlay_type == "mushroom":
+                    overlay_source = ":/assets/Environment/Decoration/spr_mushroom_01.png"
+                elif overlay_type == "rock":
+                    overlay_source = ":/assets/Environment/Decoration/spr_rock_01.png"
+                elif overlay_type == "tree":
+                    overlay_source = ":/assets/Environment/Decoration/spr_tree_01_normal.png"
+                overlay_pixmap = QPixmap(overlay_source).scaled(self.GRID_SIZE // 3, self.GRID_SIZE // 3)
+                overlay_item = QGraphicsPixmapItem(overlay_pixmap)
+                overlay_item.setPos(x * self.GRID_SIZE, y * self.GRID_SIZE)
+                self.scene.addItem(overlay_item)
+                self.scene.overlay_items.append({"item": overlay_item, "type": overlay_type, "pos": (x, y)})
+
+            # Dodaj wieże
+            for tower_data in state["towers"]:
+                position = tower_data["position"]
+                tower_type = tower_data["type"]
+                level = int(tower_data["level"])
+                x, y = int(position["x"]), int(position["y"])
+                if tower_type == "archer":
+                    tower = AnimatedTower(x, y, self.scene)
+                elif tower_type == "lightning":
+                    tower = LightningTower(x, y, self.scene)
+                else:
+                    continue
+                for _ in range(level):
+                    tower.upgrade()
+                self.scene.addItem(tower)
+                self.scene.tower_positions.add((x, y))
+
+            self.scene.second_init()
+            self.updateLifes()
+            self.scene.update_level(self.current_level)
+            self.scene.update_money(self.money)
+
+            print("Gra została wczytana pomyślnie!")
+        except Exception as e:
+            print(f"Błąd podczas wczytywania gry: {e}")
+
