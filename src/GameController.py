@@ -6,6 +6,7 @@ from Towers import AnimatedTower, LightningTower
 from Enemies import AnimatedEnemy, FastEnemy, TankEnemy
 from GameConfig import Config
 from GameHistory import GameHistory
+from network import NetworkManager
 
 
 
@@ -27,6 +28,25 @@ class GameController:
         self.scene.update_money(self.money)
         self.game_over = False
         self.game_history = GameHistory()
+        self.is_sending = False
+        network_config = self.config.get_network_config()
+        self.network_manager = None
+        try:
+            self.network_manager = NetworkManager(network_config["ip_address"], network_config["port"], is_server=False)
+            self.is_sending = True
+            self.network_manager.send_message({
+                "action": "init_game",
+                "grid": self.scene.path,
+                "overlay_items": [{"type": overlay["type"], "position": {"x": overlay["pos"][0], "y": overlay["pos"][1]}}for overlay in self.scene.overlay_items],
+                "money": self.money,
+                "lives": self.lives,
+                "level": self.current_level,
+                "config": self.config.get_config()
+            })
+            print("Network manager initialized successfully.")
+        except Exception as e:
+            print(f"Error initializing network manager: {e}")
+            self.network_manager = False
 
     def EventFilter(self, obj, event):
         if self.game_over:
@@ -41,6 +61,12 @@ class GameController:
             if event.button() == Qt.LeftButton:
                 return self.handle_mouse_event(event)
         return False
+    
+    def upgrade_tower(self, tower):
+        self.money -= 10
+        self.scene.update_money(self.money)
+
+        tower.upgrade()
 
     def handle_mouse_event(self, event):
         pos = event.scenePos()
@@ -53,10 +79,13 @@ class GameController:
                         print("Not enough money to upgrade the tower!")
                         return False
 
-                    self.money -= 10
-                    self.scene.update_money(self.money)
-
-                    item.upgrade()
+                    self.upgrade_tower(item)
+                    if self.is_sending:
+                        self.network_manager.send_message({
+                            "action": "upgrade_tower",
+                            "tower_position": {"x": item.x() // self.GRID_SIZE, "y": item.y() // self.GRID_SIZE},
+                            "new_level": item.upgrade_count
+                        })
                     print(f"Tower upgraded! New damage: {item.damage}, new range: {item.range}")
                     return True
 
@@ -67,6 +96,12 @@ class GameController:
             
         if (x, y) not in self.scene.get_path():
             if self.addTower(x, y, tower_type="lightning" if Qt.Key_L in self.pressed_keys else "archer"):
+                if self.is_sending:
+                    self.network_manager.send_message({
+                        "action": "add_tower",
+                        "tower_position": {"x": x, "y": y},
+                        "tower_type": "lightning" if Qt.Key_L in self.pressed_keys else "archer"
+                    })
                 self.scene.update_money(self.money)
                 return True
             else:
@@ -153,6 +188,12 @@ class GameController:
         self.active_enemies = 0
         self.scene.update_level(self.current_level)
         self.scene.start_button.hide() 
+        if self.is_sending:
+            self.network_manager.send_message({
+                "action": "start_level",
+                "level": self.current_level,
+                "enemies_to_spawn": self.enemies_to_spawn
+            })
         self.spawn_wave()
 
     def spawn_wave(self):

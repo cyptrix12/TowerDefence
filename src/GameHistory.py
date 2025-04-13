@@ -36,7 +36,7 @@ class GameHistory:
 
         self.save_to_json("game_state1.json")
         self.save_to_xml("game_state1.xml")
-        self.save_to_mongodb("game_db", "game_history")
+        # self.save_to_mongodb("game_db", "game_history")
 
     def save_to_json(self, filepath):
         """Zapisuje stan gry do pliku JSON."""
